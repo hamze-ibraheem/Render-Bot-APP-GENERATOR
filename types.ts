@@ -1,0 +1,96 @@
+
+export type Page = 'home' | 'generator' | 'marketplace' | 'login' | 'dashboard' | 'pricing' | 'vendors' | 'copyright' | 'terms' | 'privacy';
+
+export type LicenseType = 'Standard' | 'Extended' | 'Exclusive';
+
+export interface Review {
+  id: string;
+  userName: string;
+  userAvatar: string;
+  rating: number; // 1-5
+  comment: string;
+  date: string;
+}
+
+export interface AppProduct {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  price: number;
+  category: string;
+  features: string[];
+  techStack: string[];
+  targetAudience: string;
+  imageSeed?: number; // Used to generate deterministic placeholder images
+  isAI?: boolean;
+  vendorId?: string;
+  vendorName?: string;
+  imageUrl?: string; // Optional custom image URL
+  licenseType?: LicenseType;
+  reviews?: Review[];
+  deployedUrl?: string;
+  deploymentStatus?: 'pending' | 'building' | 'deployed' | 'failed';
+}
+
+export interface CartItem {
+  product: AppProduct;
+  quantity: number;
+}
+
+export interface GeneratedIdeaRaw {
+  name: string;
+  tagline: string;
+  description: string;
+  price: number;
+  category: string;
+  features: string[];
+  techStack: string[];
+  targetAudience: string;
+}
+
+export type UserRole = 'user' | 'manager' | 'admin' | 'vendor';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  plan: 'Free' | 'Pro' | 'Enterprise';
+  credits: number;
+  points: number;
+  memberSince: string;
+  role: UserRole;
+}
+
+export interface PointTransaction {
+  id: string;
+  action: string;
+  amount: number;
+  type: 'earned' | 'redeemed';
+  date: string;
+}
+
+export interface Order {
+  id: string;
+  date: string;
+  items: AppProduct[];
+  total: number;
+  status: 'Completed' | 'Processing';
+  downloadUrl?: string;
+  shipping?: {
+    status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered';
+    trackingNumber: string;
+    address: string;
+    estimatedDelivery: string;
+  };
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: 'Active' | 'Invited';
+  lastActive: string;
+}

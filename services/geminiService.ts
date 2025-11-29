@@ -7,18 +7,20 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateAppIdeas = async (
   niche: string,
+  platform: string = 'Mobile',
+  complexity: string = 'Standard',
   count: number = 3
 ): Promise<GeneratedIdeaRaw[]> => {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `Generate ${count} unique, viable, and innovative mobile app ideas for the niche: "${niche}". 
+      contents: `Generate ${count} unique, viable, and innovative ${complexity} ${platform} app ideas for the niche: "${niche}". 
       Each idea MUST include both English and Arabic versions for the name, tagline, description, category, feature list, and target audience.
       For the Arabic fields, ensure the translation is high-quality, professional, and culturally appropriate.
-      Include a suggested price for the source code ($20-$500) and a tech stack.`,
+      Include a suggested price for the source code ($20-$500) and a tech stack suitable for a ${complexity} ${platform} application.`,
       config: {
         thinkingConfig: {
-          thinkingBudget: 1024,
+          thinkingBudget: 2048,
         },
         responseMimeType: "application/json",
         responseSchema: {

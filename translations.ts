@@ -11,6 +11,7 @@ export const translations = {
     nav_pricing: "Pricing",
     nav_dashboard: "Dashboard",
     nav_signin: "Sign In",
+    nav_download_app: "Download App",
     
     // Hero
     hero_badge: "Powered by Gemini 2.5 Flash",
@@ -55,6 +56,17 @@ export const translations = {
     admin_stripe_wh: "Webhook Secret",
     admin_stripe_save: "Save Configuration",
     admin_stripe_test: "Test Connection",
+
+    // Vendor Mobile Config
+    vendor_mobile_title: "Mobile App Configuration",
+    vendor_mobile_desc: "Configure and build your white-labeled Android application.",
+    vendor_mobile_appname: "App Name",
+    vendor_mobile_package: "Package Name",
+    vendor_mobile_version: "Version",
+    vendor_mobile_build: "Build APK",
+    vendor_mobile_building: "Building...",
+    vendor_mobile_download: "Download APK",
+    vendor_mobile_ready: "Build Ready",
   },
   ar: {
     // Navbar
@@ -65,6 +77,7 @@ export const translations = {
     nav_pricing: "الأسعار",
     nav_dashboard: "لوحة التحكم",
     nav_signin: "دخول",
+    nav_download_app: "حمل التطبيق",
     
     // Hero
     hero_badge: "مدعوم بواسطة Gemini 2.5 Flash",
@@ -109,5 +122,16 @@ export const translations = {
     admin_stripe_wh: "سر الويب هوك (Webhook Secret)",
     admin_stripe_save: "حفظ الإعدادات",
     admin_stripe_test: "اختبار الاتصال",
+
+    // Vendor Mobile Config
+    vendor_mobile_title: "تكوين تطبيق الجوال",
+    vendor_mobile_desc: "قم بتكوين وبناء تطبيق Android الخاص بعلامتك التجارية.",
+    vendor_mobile_appname: "اسم التطبيق",
+    vendor_mobile_package: "اسم الحزمة",
+    vendor_mobile_version: "الإصدار",
+    vendor_mobile_build: "بناء APK",
+    vendor_mobile_building: "جارٍ البناء...",
+    vendor_mobile_download: "تحميل APK",
+    vendor_mobile_ready: "البناء جاهز",
   }
 };

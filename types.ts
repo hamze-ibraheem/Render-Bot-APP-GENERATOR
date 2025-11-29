@@ -65,6 +65,21 @@ export interface GeneratedIdeaRaw {
 
 export type UserRole = 'user' | 'manager' | 'admin' | 'vendor';
 
+export interface VendorMobileConfig {
+  appName: string;
+  packageName: string; // e.g., com.vendor.app
+  version: string;
+  status: 'Not Configured' | 'Building' | 'Ready';
+  lastBuild?: string;
+  downloadUrl?: string;
+}
+
+export interface VendorStripeConfig {
+  isConnected: boolean;
+  stripeId?: string;
+  currency: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -75,6 +90,8 @@ export interface User {
   points: number;
   memberSince: string;
   role: UserRole;
+  vendorStripe?: VendorStripeConfig;
+  mobileConfig?: VendorMobileConfig;
 }
 
 export interface PointTransaction {

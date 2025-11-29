@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ShoppingBag, Zap, LayoutDashboard, UserIcon, Store, Trophy, Sun, Moon, Globe } from './Icons';
+import { ShoppingBag, Zap, LayoutDashboard, UserIcon, Store, Trophy, Sun, Moon, Globe, Android } from './Icons';
 import { Logo } from './Logo';
 import { Page, User, Language } from '../types';
 
@@ -40,7 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         <div className="flex items-center space-x-6 rtl:space-x-reverse">
-          <div className="hidden md:flex space-x-6 rtl:space-x-reverse items-center">
+          <div className="hidden lg:flex space-x-6 rtl:space-x-reverse items-center">
             <button 
               onClick={() => onNavigate('home')}
               className={`text-sm font-medium transition ${currentPage === 'home' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
@@ -85,9 +85,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden lg:block"></div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+             {/* Download App Button */}
+             <button
+               className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+               onClick={() => alert("Downloading RenderBot Android APK...")}
+             >
+               <Android className="w-4 h-4 text-green-500" />
+               {t.nav_download_app}
+             </button>
+
              {/* Language Switcher */}
              <button
               onClick={onToggleLanguage}
@@ -96,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title={language === 'en' ? 'Switch to Arabic' : 'التبديل إلى الإنجليزية'}
             >
               <Globe className="w-5 h-5" />
-              <span className="text-xs font-bold uppercase">{language}</span>
+              <span className="text-xs font-bold uppercase hidden md:inline">{language}</span>
             </button>
 
              {/* Dark Mode Toggle */}

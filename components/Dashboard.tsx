@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppProduct, Order, User, UserRole, AppProduct as VendorApp, PointTransaction, Language, AdminStripeConfig } from '../types';
+import { AppProduct, Order, User, UserRole, AppProduct as VendorApp, PointTransaction, Language, AdminStripeConfig, VendorMobileConfig } from '../types';
 import { AppCard, generateAppScreenSvg } from './AppCard';
-import { LayoutDashboard, Heart, Download, CreditCard, LogOut, Zap, ShoppingBag, History, X, Gift, Copy, Share2, Check, Users, Shield, UserIcon, Key, Activity, Globe, Lock, Plus, Store, PlusCircle, DollarSign, Edit, Trash2, Settings, Trophy, Coins, Eye, EyeOff, RefreshCw } from './Icons';
+import { LayoutDashboard, Heart, Download, CreditCard, LogOut, Zap, ShoppingBag, History, X, Gift, Copy, Share2, Check, Users, Shield, UserIcon, Key, Activity, Globe, Lock, Plus, Store, PlusCircle, DollarSign, Edit, Trash2, Settings, Trophy, Coins, Eye, EyeOff, RefreshCw, Smartphone, Android, DownloadCloud, Loader } from './Icons';
 import { MOCK_TEAM, MOCK_POINT_HISTORY } from '../constants';
 import { DeploymentModal } from './DeploymentModal';
 import { PhysicalOrderModal } from './PhysicalOrderModal';
@@ -135,6 +135,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
     avatar: currentUser.avatar,
     email: currentUser.email
   });
+
+  // Vendor Mobile App Config
+  const [mobileConfig, setMobileConfig] = useState<VendorMobileConfig>(currentUser.mobileConfig || {
+    appName: currentUser.name + ' App',
+    packageName: 'com.renderbot.app',
+    version: '1.0.0',
+    status: 'Not Configured'
+  });
+  const [isBuildingApp, setIsBuildingApp] = useState(false);
 
   const isAr = language === 'ar';
   const t = translations[language || 'en'];
@@ -331,6 +340,31 @@ export const Dashboard: React.FC<DashboardProps> = ({
     showToast(isAr ? 'الاتصال بـ Stripe ناجح' : 'Stripe connection successful');
   };
 
+  const handleBuildMobileApp = () => {
+    setIsBuildingApp(true);
+    setMobileConfig(prev => ({ ...prev, status: 'Building' }));
+    
+    // Simulate build process
+    setTimeout(() => {
+      setIsBuildingApp(false);
+      setMobileConfig(prev => ({ 
+        ...prev, 
+        status: 'Ready',
+        lastBuild: new Date().toLocaleDateString(),
+        downloadUrl: '#'
+      }));
+      onUpdateUser({ 
+        mobileConfig: {
+          ...mobileConfig,
+          status: 'Ready',
+          lastBuild: new Date().toLocaleDateString(),
+          downloadUrl: '#'
+        } 
+      });
+      showToast(isAr ? 'تم بناء ملف APK بنجاح!' : 'APK built successfully!');
+    }, 2500);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl relative">
        {toast && (
@@ -522,6 +556,89 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     {isAr ? 'إدراج تطبيق جديد' : 'List New App'}
                  </button>
                </div>
+
+                {/* Mobile App Configuration Card */}
+               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/10 dark:to-green-900/10 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                          <Smartphone className="w-6 h-6" />
+                       </div>
+                       <div>
+                          <h3 className="font-bold text-slate-900 dark:text-white">{t.vendor_mobile_title}</h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{t.vendor_mobile_desc}</p>
+                       </div>
+                    </div>
+                    {mobileConfig.status === 'Ready' && (
+                       <span className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                          <Check className="w-3 h-3" /> {t.vendor_mobile_ready}
+                       </span>
+                    )}
+                 </div>
+                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                       <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t.vendor_mobile_appname}</label>
+                          <input 
+                             type="text" 
+                             value={mobileConfig.appName}
+                             onChange={(e) => setMobileConfig({...mobileConfig, appName: e.target.value})}
+                             className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500"
+                          />
+                       </div>
+                       <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t.vendor_mobile_package}</label>
+                          <input 
+                             type="text" 
+                             value={mobileConfig.packageName}
+                             onChange={(e) => setMobileConfig({...mobileConfig, packageName: e.target.value})}
+                             className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 font-mono text-xs"
+                          />
+                       </div>
+                       <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t.vendor_mobile_version}</label>
+                          <input 
+                             type="text" 
+                             value={mobileConfig.version}
+                             onChange={(e) => setMobileConfig({...mobileConfig, version: e.target.value})}
+                             className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500"
+                          />
+                       </div>
+                    </div>
+                    <div className="flex flex-col justify-center items-center bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6">
+                       <Android className="w-16 h-16 text-emerald-500 mb-4" />
+                       {mobileConfig.status === 'Ready' ? (
+                          <div className="text-center">
+                             <div className="text-sm font-bold text-slate-900 dark:text-white mb-1">APK Generated</div>
+                             <div className="text-xs text-slate-500 dark:text-slate-400 mb-4">Version {mobileConfig.version} • {mobileConfig.lastBuild}</div>
+                             <button className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition flex items-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-none">
+                                <DownloadCloud className="w-4 h-4" /> {t.vendor_mobile_download}
+                             </button>
+                          </div>
+                       ) : (
+                          <div className="text-center w-full">
+                             <button 
+                                onClick={handleBuildMobileApp}
+                                disabled={isBuildingApp}
+                                className="w-full px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-bold hover:opacity-90 transition flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                             >
+                                {isBuildingApp ? (
+                                   <>
+                                      <Loader className="w-4 h-4 animate-spin" /> {t.vendor_mobile_building}
+                                   </>
+                                ) : (
+                                   <>
+                                      <Zap className="w-4 h-4" /> {t.vendor_mobile_build}
+                                   </>
+                                )}
+                             </button>
+                             <p className="text-xs text-slate-400 mt-2">Compiles your store into a white-labeled Android app.</p>
+                          </div>
+                       )}
+                    </div>
+                 </div>
+               </div>
+
                {/* Stats and Table logic remain similar, just need translations for headers */}
                {/* ... */}
                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">

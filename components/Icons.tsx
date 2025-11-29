@@ -176,6 +176,18 @@ export const Download = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const DownloadCloud = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" 
+    {...props}
+  >
+    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+    <path d="M12 12v9" />
+    <path d="m8 17 4 4 4-4" />
+  </svg>
+);
+
 export const History = (props: React.SVGProps<SVGSVGElement>) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -312,7 +324,7 @@ export const Globe = (props: React.SVGProps<SVGSVGElement>) => (
   >
     <circle cx="12" cy="12" r="10" />
     <line x1="2" x2="22" y1="12" y2="12" />
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10 15.3 15.3 0 0 1 4-10z" />
   </svg>
 );
 
@@ -770,5 +782,23 @@ export const Moon = (props: React.SVGProps<SVGSVGElement>) => (
     {...props}
   >
     <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </svg>
+);
+
+export const Android = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" 
+    {...props}
+  >
+    <path d="M3 4.5h18" />
+    <path d="M4 8h16" />
+    <path d="M6 12h12" />
+    <path d="M8 16h8" />
+    <circle cx="9" cy="9" r="1" fill="currentColor" />
+    <circle cx="15" cy="9" r="1" fill="currentColor" />
+    <path d="M14 2v2.5" />
+    <path d="M10 2v2.5" />
+    <path d="M5 22h14a2 2 0 0 0 2-2V4.5a.5.5 0 0 0-.5-.5h-17a.5.5 0 0 0-.5.5V20a2 2 0 0 0 2 2Z" />
   </svg>
 );

@@ -1,9 +1,8 @@
-
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { GeneratedIdeaRaw } from '../types';
 
 // Initialize the Gemini AI client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.API_KEY || "");
 
 export const generateAppIdeas = async (
   niche: string,
@@ -12,45 +11,47 @@ export const generateAppIdeas = async (
   count: number = 3
 ): Promise<GeneratedIdeaRaw[]> => {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Generate ${count} unique, viable, and innovative ${complexity} ${platform} app ideas for the niche: "${niche}". 
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
+
+    const prompt = `Generate ${count} unique, viable, and innovative ${complexity} ${platform} app ideas for the niche: "${niche}". 
       Each idea MUST include both English and Arabic versions for the name, tagline, description, category, feature list, and target audience.
       For the Arabic fields, ensure the translation is high-quality, professional, and culturally appropriate.
-      Include a suggested price for the source code ($20-$500) and a tech stack suitable for a ${complexity} ${platform} application.`,
-      config: {
-        thinkingConfig: {
-          thinkingBudget: 2048,
-        },
+      Include a suggested price for the source code ($20-$500) and a tech stack suitable for a ${complexity} ${platform} application.`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }]}],
+      generationConfig: {
         responseMimeType: "application/json",
         responseSchema: {
-          type: Type.ARRAY,
+          type: SchemaType.ARRAY,
           items: {
-            type: Type.OBJECT,
+            type: SchemaType.OBJECT,
             properties: {
-              name: { type: Type.STRING },
-              name_ar: { type: Type.STRING },
-              tagline: { type: Type.STRING },
-              tagline_ar: { type: Type.STRING },
-              description: { type: Type.STRING },
-              description_ar: { type: Type.STRING },
-              price: { type: Type.NUMBER },
-              category: { type: Type.STRING },
-              category_ar: { type: Type.STRING },
+              name: { type: SchemaType.STRING },
+              name_ar: { type: SchemaType.STRING },
+              tagline: { type: SchemaType.STRING },
+              tagline_ar: { type: SchemaType.STRING },
+              description: { type: SchemaType.STRING },
+              description_ar: { type: SchemaType.STRING },
+              price: { type: SchemaType.NUMBER },
+              category: { type: SchemaType.STRING },
+              category_ar: { type: SchemaType.STRING },
               features: { 
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING }
               },
               features_ar: { 
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING }
               },
               techStack: { 
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.STRING }
               },
-              targetAudience: { type: Type.STRING },
-              targetAudience_ar: { type: Type.STRING }
+              targetAudience: { type: SchemaType.STRING },
+              targetAudience_ar: { type: SchemaType.STRING }
             },
             required: [
               "name", "name_ar", 
@@ -67,8 +68,10 @@ export const generateAppIdeas = async (
       }
     });
 
-    if (response.text) {
-      const data = JSON.parse(response.text) as GeneratedIdeaRaw[];
+    const response = result.response;
+    if (response) {
+      const text = response.text();
+      const data = JSON.parse(text) as GeneratedIdeaRaw[];
       return data;
     }
     

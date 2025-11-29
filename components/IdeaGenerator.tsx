@@ -49,6 +49,7 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
       setCurrentIdeas(processedIdeas);
       onIdeasGenerated(processedIdeas);
     } catch (err) {
+      console.error("Failed to generate ideas:", err);
       setError(isAr 
         ? "فشل في توليد الأفكار. يرجى المحاولة بموضوع مختلف أو التحقق من الاتصال." 
         : "Failed to generate ideas. Please try a different topic or check your connection."

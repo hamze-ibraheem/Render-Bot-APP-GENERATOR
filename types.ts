@@ -63,7 +63,7 @@ export interface GeneratedIdeaRaw {
   targetAudience_ar: string;
 }
 
-export type UserRole = 'user' | 'manager' | 'admin' | 'vendor';
+export type UserRole = 'user' | 'manager' | 'admin' | 'vendor' | 'developer' | 'super-admin';
 
 export interface VendorMobileConfig {
   appName: string;

@@ -134,11 +134,66 @@ export default function App() {
     showToast(language === 'ar' ? "تم توليد أفكار جديدة بنجاح!" : "New ideas generated successfully!");
   };
 
-  const handleLogin = (email: string) => {
-    // Simulate login by setting mock user
+  const handleLogin = (email: string, password?: string) => {
+    // Check for Super Admin credentials
+    if (email === 'hamzaalsarsour@taskfoundation.net' && password === 'Hamzere@RE589185') {
+       const superAdminUser: User = {
+         id: 'sa-001',
+         name: 'Hamza Alsarsour',
+         email: email,
+         avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hamza',
+         plan: 'Enterprise',
+         credits: 999999,
+         points: 999999,
+         memberSince: 'Mar 2024',
+         role: 'super-admin',
+         mobileConfig: {
+           appName: 'Task Foundation App',
+           packageName: 'net.taskfoundation.app',
+           version: '1.0.0',
+           status: 'Ready'
+         }
+       };
+       setUser(superAdminUser);
+       showToast(language === 'ar' ? `مرحباً بك أيها المسؤول المتميز، حمزة!` : `Welcome Super Admin, Hamza!`);
+       navigateTo('dashboard');
+       return;
+    }
+
+    // Simulate standard login by setting mock user
     const newUser = { ...MOCK_USER, email };
     setUser(newUser);
     showToast(language === 'ar' ? `مرحباً بعودتك، ${newUser.name}!` : `Welcome back, ${newUser.name}!`);
+    navigateTo('dashboard');
+  };
+
+  const handleSignup = (name: string, email: string, role: UserRole) => {
+    // Check if role requires approval
+    if (role === 'admin' || role === 'vendor') {
+       showToast(language === 'ar' 
+         ? "تم استلام طلبك! حسابك قيد المراجعة للموافقة." 
+         : "Registration successful! Your account is pending approval.");
+       // Do not set user, navigate to login
+       navigateTo('login');
+       return;
+    }
+
+    // Create new user object based on signup info
+    const newUser: User = {
+      id: `u-${Date.now()}`,
+      name,
+      email,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.replace(/\s+/g, '')}`,
+      plan: 'Free',
+      // Give more initial credits to Developers and Vendors
+      credits: (role === 'developer') ? 50 : 20,
+      points: 0,
+      memberSince: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      role: role
+    };
+
+    setUser(newUser);
+    showToast(language === 'ar' ? `تم إنشاء الحساب! مرحباً، ${name}` : `Account created! Welcome, ${name}`);
     navigateTo('dashboard');
   };
 
@@ -309,7 +364,7 @@ export default function App() {
         )}
 
         {currentPage === 'login' && (
-          <AuthPage onLogin={handleLogin} />
+          <AuthPage onLogin={handleLogin} onSignup={handleSignup} language={language} />
         )}
 
         {currentPage === 'dashboard' && user && (

@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight } from './Icons';
+import { ArrowRight } from './Icons';
+import { Logo } from './Logo';
 
 interface AuthPageProps {
   onLogin: (email: string) => void;
@@ -22,14 +24,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-slate-100">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-10 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg mb-4">
-            <Sparkles className="w-7 h-7" />
+          <div className="flex justify-center mb-6">
+             <Logo className="w-16 h-16" withText={false} />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-slate-600">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome back</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             Sign in to access your dashboard and saved ideas
           </p>
         </div>
@@ -43,7 +45,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                 name="email"
                 type="email"
                 required
-                className="appearance-none relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition"
+                className="appearance-none relative block w-full px-4 py-3 border border-slate-300 dark:border-slate-700 placeholder-slate-500 dark:placeholder-slate-400 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition dark:bg-slate-800"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -56,7 +58,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                 name="password"
                 type="password"
                 required
-                className="appearance-none relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-500 text-slate-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition"
+                className="appearance-none relative block w-full px-4 py-3 border border-slate-300 dark:border-slate-700 placeholder-slate-500 dark:placeholder-slate-400 text-slate-900 dark:text-white rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition dark:bg-slate-800"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -72,13 +74,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
                 type="checkbox"
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-900">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-900 dark:text-slate-300">
                 Remember me
               </label>
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <a href="#" className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
                 Forgot password?
               </a>
             </div>
@@ -88,7 +90,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-slate-900 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-slate-900 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition disabled:opacity-70 disabled:cursor-not-allowed shadow-lg dark:shadow-none"
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
               {!isLoading && (
@@ -100,8 +102,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
           </div>
         </form>
         
-        <p className="text-center text-sm text-slate-600">
-          Don't have an account? <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">Sign up</a>
+        <p className="text-center text-sm text-slate-600 dark:text-slate-400">
+          Don't have an account? <a href="#" className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">Sign up</a>
         </p>
       </div>
     </div>

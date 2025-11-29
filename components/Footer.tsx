@@ -1,45 +1,48 @@
+
 import React from 'react';
 import { Page } from '../types';
+import { Logo } from './Logo';
 
 interface FooterProps {
   onNavigate?: (page: Page) => void;
+  t: any; // Translation object
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate, t }) => {
   return (
     <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-12 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="col-span-1 md:col-span-2">
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-violet-700 dark:from-indigo-400 dark:to-violet-400 mb-4 inline-block">
-              RenderBot
-            </span>
+            <div className="mb-4">
+               <Logo className="w-8 h-8" withText={true} />
+            </div>
             <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-              Empowering entrepreneurs with AI-generated app blueprints and a marketplace of high-quality, ready-to-ship codebases.
+              {t.footer_desc}
             </p>
           </div>
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-4">Platform</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-4">{t.footer_col_platform}</h4>
             <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-              <li><button onClick={() => onNavigate && onNavigate('marketplace')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Marketplace</button></li>
-              <li><button onClick={() => onNavigate && onNavigate('generator')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Idea Generator</button></li>
-              <li><button onClick={() => onNavigate && onNavigate('pricing')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Pricing</button></li>
-              <li><button onClick={() => onNavigate && onNavigate('vendors')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Vendors</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('marketplace')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.nav_marketplace}</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('generator')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.nav_generator}</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('pricing')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.nav_pricing}</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('vendors')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.nav_vendors}</button></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-4">Legal</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-4">{t.footer_col_legal}</h4>
             <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-              <li><button onClick={() => onNavigate && onNavigate('terms')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Terms of Service</button></li>
-              <li><button onClick={() => onNavigate && onNavigate('privacy')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Privacy Policy</button></li>
-              <li><button onClick={() => onNavigate && onNavigate('copyright')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Copyright Policy</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('terms')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.footer_terms}</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('privacy')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.footer_privacy}</button></li>
+              <li><button onClick={() => onNavigate && onNavigate('copyright')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">{t.footer_copyright}</button></li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-slate-100 dark:border-slate-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-            <p className="text-sm text-slate-400">© 2024 Task Foundation LLC. All rights reserved.</p>
+            <p className="text-sm text-slate-400">{t.footer_rights}</p>
             <div className="flex gap-4">
                {/* Social icons placeholder */}
                <a href="#" className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
@@ -52,31 +55,30 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
 
           <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-6 text-xs text-slate-500 dark:text-slate-400 leading-relaxed border border-slate-100 dark:border-slate-700">
-             <strong className="block text-slate-700 dark:text-slate-300 mb-2 font-semibold">Vendor Intellectual Property & License Notice</strong>
+             <strong className="block text-slate-700 dark:text-slate-300 mb-2 font-semibold">{t.license_title}</strong>
              <p className="mb-3">
-               RenderBot is a platform operated by Task Foundation LLC. All blueprints and codebases listed remain the intellectual property of their respective vendors. 
-               Purchase grants a specific license for usage, not ownership of the original asset.
+               {t.license_desc}
              </p>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                <div className="flex gap-2 items-start">
                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5"></div>
                   <div>
-                     <strong className="text-slate-700 dark:text-slate-300">Standard License</strong>
-                     <p>For single end product. No end-user charges allowed.</p>
+                     <strong className="text-slate-700 dark:text-slate-300">{t.lic_standard}</strong>
+                     <p>{t.lic_standard_desc}</p>
                   </div>
                </div>
                <div className="flex gap-2 items-start">
                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5"></div>
                   <div>
-                     <strong className="text-slate-700 dark:text-slate-300">Extended License</strong>
-                     <p>For single end product. End-user charges allowed (SaaS).</p>
+                     <strong className="text-slate-700 dark:text-slate-300">{t.lic_extended}</strong>
+                     <p>{t.lic_extended_desc}</p>
                   </div>
                </div>
                <div className="flex gap-2 items-start">
                   <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5"></div>
                   <div>
-                     <strong className="text-slate-700 dark:text-slate-300">Exclusive License</strong>
-                     <p>Full transfer of IP ownership and resale rights.</p>
+                     <strong className="text-slate-700 dark:text-slate-300">{t.lic_exclusive}</strong>
+                     <p>{t.lic_exclusive_desc}</p>
                   </div>
                </div>
              </div>

@@ -2,6 +2,7 @@
 export type Page = 'home' | 'generator' | 'marketplace' | 'login' | 'dashboard' | 'pricing' | 'vendors' | 'copyright' | 'terms' | 'privacy';
 
 export type LicenseType = 'Standard' | 'Extended' | 'Exclusive';
+export type Language = 'en' | 'ar';
 
 export interface Review {
   id: string;
@@ -9,19 +10,26 @@ export interface Review {
   userAvatar: string;
   rating: number; // 1-5
   comment: string;
+  comment_ar?: string;
   date: string;
 }
 
 export interface AppProduct {
   id: string;
   name: string;
+  name_ar?: string;
   tagline: string;
+  tagline_ar?: string;
   description: string;
+  description_ar?: string;
   price: number;
   category: string;
+  category_ar?: string;
   features: string[];
+  features_ar?: string[];
   techStack: string[];
   targetAudience: string;
+  targetAudience_ar?: string;
   imageSeed?: number; // Used to generate deterministic placeholder images
   isAI?: boolean;
   vendorId?: string;
@@ -40,13 +48,19 @@ export interface CartItem {
 
 export interface GeneratedIdeaRaw {
   name: string;
+  name_ar: string;
   tagline: string;
+  tagline_ar: string;
   description: string;
+  description_ar: string;
   price: number;
   category: string;
+  category_ar: string;
   features: string[];
+  features_ar: string[];
   techStack: string[];
   targetAudience: string;
+  targetAudience_ar: string;
 }
 
 export type UserRole = 'user' | 'manager' | 'admin' | 'vendor';
@@ -93,4 +107,12 @@ export interface TeamMember {
   role: UserRole;
   status: 'Active' | 'Invited';
   lastActive: string;
+}
+
+export interface AdminStripeConfig {
+  isEnabled: boolean;
+  isTestMode: boolean;
+  publishableKey: string;
+  secretKey: string;
+  webhookSecret: string;
 }

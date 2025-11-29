@@ -1,6 +1,8 @@
+
 import React from 'react';
-import { ShoppingBag, Sparkles, Zap, LayoutDashboard, UserIcon, Store, Trophy, Sun, Moon } from './Icons';
-import { Page, User } from '../types';
+import { ShoppingBag, Zap, LayoutDashboard, UserIcon, Store, Trophy, Sun, Moon, Globe } from './Icons';
+import { Logo } from './Logo';
+import { Page, User, Language } from '../types';
 
 interface NavbarProps {
   onNavigate: (page: Page) => void;
@@ -10,57 +12,66 @@ interface NavbarProps {
   user: User | null;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  language: Language;
+  onToggleLanguage: () => void;
+  t: any; // Translation object
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, onOpenCart, currentPage, user, theme, onToggleTheme }) => {
+export const Navbar: React.FC<NavbarProps> = ({ 
+  onNavigate, 
+  cartCount, 
+  onOpenCart, 
+  currentPage, 
+  user, 
+  theme, 
+  onToggleTheme,
+  language,
+  onToggleLanguage,
+  t
+}) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/20 dark:border-slate-800 transition-colors duration-300">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div 
-          className="flex items-center space-x-2 cursor-pointer group"
+          className="flex items-center cursor-pointer group"
           onClick={() => onNavigate('home')}
         >
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-violet-700 dark:from-indigo-400 dark:to-violet-400">
-            RenderBot
-          </span>
+          <Logo className="w-10 h-10 group-hover:scale-105 transition-transform duration-300" withText={true} />
         </div>
 
-        <div className="flex items-center space-x-6">
-          <div className="hidden md:flex space-x-6 items-center">
+        <div className="flex items-center space-x-6 rtl:space-x-reverse">
+          <div className="hidden md:flex space-x-6 rtl:space-x-reverse items-center">
             <button 
               onClick={() => onNavigate('home')}
               className={`text-sm font-medium transition ${currentPage === 'home' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
             >
-              Home
+              {t.nav_home}
             </button>
             <button 
               onClick={() => onNavigate('generator')}
               className={`text-sm font-medium transition flex items-center gap-1 ${currentPage === 'generator' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
             >
               <Zap className="w-4 h-4" />
-              Generator
+              {t.nav_generator}
             </button>
             <button 
               onClick={() => onNavigate('marketplace')}
               className={`text-sm font-medium transition ${currentPage === 'marketplace' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
             >
-              Marketplace
+              {t.nav_marketplace}
             </button>
             <button 
               onClick={() => onNavigate('vendors')}
               className={`text-sm font-medium transition flex items-center gap-1 ${currentPage === 'vendors' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
             >
               <Store className="w-4 h-4" />
-              Vendors
+              {t.nav_vendors}
             </button>
             <button 
               onClick={() => onNavigate('pricing')}
               className={`text-sm font-medium transition ${currentPage === 'pricing' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
             >
-              Pricing
+              {t.nav_pricing}
             </button>
             
             {user && (
@@ -69,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, onOpenCar
                 className={`text-sm font-medium transition flex items-center gap-1 ${currentPage === 'dashboard' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
               >
                 <LayoutDashboard className="w-4 h-4" />
-                Dashboard
+                {t.nav_dashboard}
               </button>
             )}
           </div>
@@ -77,6 +88,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, onOpenCar
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
 
           <div className="flex items-center gap-4">
+             {/* Language Switcher */}
+             <button
+              onClick={onToggleLanguage}
+              className="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-1"
+              aria-label="Toggle Language"
+              title={language === 'en' ? 'Switch to Arabic' : 'التبديل إلى الإنجليزية'}
+            >
+              <Globe className="w-5 h-5" />
+              <span className="text-xs font-bold uppercase">{language}</span>
+            </button>
+
              {/* Dark Mode Toggle */}
             <button
               onClick={onToggleTheme}
@@ -127,7 +149,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNavigate, cartCount, onOpenCar
                 className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-600 dark:hover:bg-indigo-500 transition shadow-md"
               >
                 <UserIcon className="w-4 h-4" />
-                Sign In
+                {t.nav_signin}
               </button>
             )}
           </div>

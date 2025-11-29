@@ -1,9 +1,8 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedIdeaRaw } from '../types';
 
 // Initialize the Gemini AI client
-// Note: In a real production app, ensure this is handled securely on the backend if possible,
-// or via env vars in a secure build process.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateAppIdeas = async (
@@ -14,8 +13,9 @@ export const generateAppIdeas = async (
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Generate ${count} unique, viable, and innovative mobile app ideas for the niche: "${niche}". 
-      Each idea should include a catchy name, a tagline, a detailed description, a suggested price for the source code (between $20 and $500), 
-      a category, a list of 4 key features, a recommended tech stack (3 items), and a target audience.`,
+      Each idea MUST include both English and Arabic versions for the name, tagline, description, category, feature list, and target audience.
+      For the Arabic fields, ensure the translation is high-quality, professional, and culturally appropriate.
+      Include a suggested price for the source code ($20-$500) and a tech stack.`,
       config: {
         thinkingConfig: {
           thinkingBudget: 1024,
@@ -27,11 +27,19 @@ export const generateAppIdeas = async (
             type: Type.OBJECT,
             properties: {
               name: { type: Type.STRING },
+              name_ar: { type: Type.STRING },
               tagline: { type: Type.STRING },
+              tagline_ar: { type: Type.STRING },
               description: { type: Type.STRING },
+              description_ar: { type: Type.STRING },
               price: { type: Type.NUMBER },
               category: { type: Type.STRING },
+              category_ar: { type: Type.STRING },
               features: { 
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
+              },
+              features_ar: { 
                 type: Type.ARRAY,
                 items: { type: Type.STRING }
               },
@@ -39,9 +47,19 @@ export const generateAppIdeas = async (
                 type: Type.ARRAY,
                 items: { type: Type.STRING }
               },
-              targetAudience: { type: Type.STRING }
+              targetAudience: { type: Type.STRING },
+              targetAudience_ar: { type: Type.STRING }
             },
-            required: ["name", "tagline", "description", "price", "category", "features", "techStack", "targetAudience"]
+            required: [
+              "name", "name_ar", 
+              "tagline", "tagline_ar", 
+              "description", "description_ar", 
+              "price", 
+              "category", "category_ar", 
+              "features", "features_ar", 
+              "techStack", 
+              "targetAudience", "targetAudience_ar"
+            ]
           }
         }
       }
@@ -55,7 +73,6 @@ export const generateAppIdeas = async (
     throw new Error("No data returned from AI");
   } catch (error) {
     console.error("Error generating app ideas:", error);
-    // Fallback or rethrow
     throw error;
   }
 };

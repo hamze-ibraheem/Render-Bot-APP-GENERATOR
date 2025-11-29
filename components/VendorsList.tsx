@@ -1,11 +1,15 @@
+
 import React from 'react';
 import { Store, Star, ArrowRight, Zap, Award } from './Icons';
+import { Language } from '../types';
 
 interface Vendor {
   id: string;
   name: string;
   tagline: string;
+  tagline_ar: string;
   description: string;
+  description_ar: string;
   avatar: string;
   appsCount: number;
   rating: number;
@@ -18,7 +22,9 @@ const MOCK_VENDORS: Vendor[] = [
     id: 'v1',
     name: 'TechFlow Studio',
     tagline: 'Enterprise-grade Business Apps',
+    tagline_ar: 'تطبيقات أعمال على مستوى المؤسسات',
     description: 'Specializing in high-performance React Native applications for workflow automation and team productivity. Trusted by over 500 companies.',
+    description_ar: 'متخصصون في تطبيقات React Native عالية الأداء لأتمتة سير العمل وإنتاجية الفريق. موثوق بهم من قبل أكثر من 500 شركة.',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=TechFlow',
     appsCount: 24,
     rating: 4.9,
@@ -29,7 +35,9 @@ const MOCK_VENDORS: Vendor[] = [
     id: 'v2',
     name: 'PixelPerfect',
     tagline: 'Beautiful Consumer Apps',
+    tagline_ar: 'تطبيقات استهلاكية جميلة',
     description: 'We craft stunning, animation-rich mobile experiences using Flutter. Our apps focus on wellness, lifestyle, and social connection.',
+    description_ar: 'نصنع تجارب جوال مذهلة وغنية بالرسوم المتحركة باستخدام Flutter. تركز تطبيقاتنا على العافية وأسلوب الحياة والتواصل الاجتماعي.',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Pixel',
     appsCount: 18,
     rating: 4.8,
@@ -40,7 +48,9 @@ const MOCK_VENDORS: Vendor[] = [
     id: 'v3',
     name: 'CryptoBuilders',
     tagline: 'Web3 & Fintech Solutions',
+    tagline_ar: 'حلول الويب 3 والتقنية المالية',
     description: 'Secure, audited, and ready-to-deploy dApps and wallets. Experts in Solidity, Web3.js, and financial data visualization.',
+    description_ar: 'تطبيقات لامركزية ومحافظ آمنة ومدققة وجاهزة للنشر. خبراء في Solidity و Web3.js وتصور البيانات المالية.',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Crypto',
     appsCount: 12,
     rating: 4.7,
@@ -51,7 +61,9 @@ const MOCK_VENDORS: Vendor[] = [
     id: 'v4',
     name: 'Gameify Lab',
     tagline: 'Casual Games & Gamification',
+    tagline_ar: 'ألعاب عادية وتلعيب',
     description: 'Turn engagement into revenue with our pre-built game engines and gamified loyalty platform templates.',
+    description_ar: 'حول التفاعل إلى إيرادات باستخدام محركات الألعاب المعدة مسبقًا وقوالب منصات الولاء القائمة على اللعب.',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Gameify',
     appsCount: 30,
     rating: 4.6,
@@ -62,7 +74,9 @@ const MOCK_VENDORS: Vendor[] = [
     id: 'v5',
     name: 'EduTech Pro',
     tagline: 'Learning Management Systems',
+    tagline_ar: 'أنظمة إدارة التعلم',
     description: 'Scalable educational platforms for schools and coaching centers. Includes video streaming, quizzes, and progress tracking modules.',
+    description_ar: 'منصات تعليمية قابلة للتطوير للمدارس ومراكز التدريب. تتضمن وحدات تدفق الفيديو والاختبارات وتتبع التقدم.',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Edu',
     appsCount: 9,
     rating: 5.0,
@@ -73,7 +87,9 @@ const MOCK_VENDORS: Vendor[] = [
     id: 'v6',
     name: 'HealthStack',
     tagline: 'HIPAA Compliant Health Apps',
+    tagline_ar: 'تطبيقات صحية متوافقة مع HIPAA',
     description: 'Secure telemedicine and patient management blueprints designed with privacy and compliance at the core.',
+    description_ar: 'مخططات آمنة للتطبيب عن بعد وإدارة المرضى مصممة مع الخصوصية والامتثال في جوهرها.',
     avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Health',
     appsCount: 15,
     rating: 4.8,
@@ -85,22 +101,27 @@ const MOCK_VENDORS: Vendor[] = [
 interface VendorsListProps {
   onNavigate: () => void;
   onBecomeVendor?: () => void;
+  language?: Language;
 }
 
-export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVendor }) => {
+export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVendor, language = 'en' }) => {
+  const isAr = language === 'ar';
+
   return (
     <div className="container mx-auto px-4 py-12 max-w-7xl">
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-medium mb-6">
           <Store className="w-4 h-4" />
-          <span>Verified Creators</span>
+          <span>{isAr ? 'منشئون موثوقون' : 'Verified Creators'}</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-          Meet the Minds Behind the Apps
+          {isAr ? 'قابل العقول المبدعة خلف التطبيقات' : 'Meet the Minds Behind the Apps'}
         </h1>
         <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-          Browse our directory of top-tier developers and studios. 
-          Discover specialized vendors for every niche, from Fintech to Gaming.
+          {isAr 
+            ? 'تصفح دليلنا لأفضل المطورين والاستوديوهات. اكتشف بائعين متخصصين في كل مجال، من التقنية المالية إلى الألعاب.'
+            : 'Browse our directory of top-tier developers and studios. Discover specialized vendors for every niche, from Fintech to Gaming.'
+          }
         </p>
       </div>
 
@@ -114,12 +135,12 @@ export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVe
               <div className="flex gap-1">
                 {vendor.badges.includes('Verified') && (
                   <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
-                    <Award className="w-3 h-3" /> Verified
+                    <Award className="w-3 h-3" /> {isAr ? 'موثق' : 'Verified'}
                   </span>
                 )}
                 {vendor.badges.includes('Top Seller') && (
                   <span className="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
-                    <Zap className="w-3 h-3" /> Top
+                    <Zap className="w-3 h-3" /> {isAr ? 'الأفضل' : 'Top'}
                   </span>
                 )}
               </div>
@@ -127,9 +148,9 @@ export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVe
 
             <div className="mb-4">
               <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-indigo-600 transition">{vendor.name}</h3>
-              <p className="text-sm font-medium text-indigo-600 mb-3">{vendor.tagline}</p>
+              <p className="text-sm font-medium text-indigo-600 mb-3">{isAr ? vendor.tagline_ar : vendor.tagline}</p>
               <p className="text-slate-600 text-sm line-clamp-3 mb-4 flex-grow">
-                {vendor.description}
+                {isAr ? vendor.description_ar : vendor.description}
               </p>
             </div>
 
@@ -137,7 +158,7 @@ export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVe
               <div className="flex items-center gap-4 text-sm text-slate-500">
                 <div className="flex items-center gap-1">
                   <Store className="w-4 h-4" />
-                  <span className="font-semibold text-slate-900">{vendor.appsCount}</span> Apps
+                  <span className="font-semibold text-slate-900">{vendor.appsCount}</span> {isAr ? 'تطبيقات' : 'Apps'}
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-amber-400 fill-current" />
@@ -149,7 +170,7 @@ export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVe
                 onClick={onNavigate}
                 className="text-indigo-600 font-bold text-sm hover:text-indigo-800 transition flex items-center gap-1"
               >
-                Visit Store <ArrowRight className="w-4 h-4" />
+                {isAr ? 'زيارة المتجر' : 'Visit Store'} <ArrowRight className={`w-4 h-4 ${isAr ? 'rotate-180' : ''}`} />
               </button>
             </div>
           </div>
@@ -158,15 +179,18 @@ export const VendorsList: React.FC<VendorsListProps> = ({ onNavigate, onBecomeVe
       
       <div className="mt-16 bg-slate-900 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden">
         <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-4">Are you a developer?</h2>
+          <h2 className="text-3xl font-bold mb-4">{isAr ? 'هل أنت مطور؟' : 'Are you a developer?'}</h2>
           <p className="text-slate-300 max-w-xl mx-auto mb-8">
-            Join the RenderBot Vendor Program and start selling your high-quality app blueprints to thousands of entrepreneurs today.
+            {isAr 
+              ? 'انضم إلى برنامج بائعي RenderBot وابدأ ببيع مخططات تطبيقاتك عالية الجودة لآلاف رواد الأعمال اليوم.'
+              : 'Join the RenderBot Vendor Program and start selling your high-quality app blueprints to thousands of entrepreneurs today.'
+            }
           </p>
           <button 
             onClick={onBecomeVendor}
             className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition shadow-lg shadow-indigo-900/50"
           >
-            Apply to Sell
+            {isAr ? 'قدم للبيع' : 'Apply to Sell'}
           </button>
         </div>
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20 pointer-events-none"></div>

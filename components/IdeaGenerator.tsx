@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { generateAppIdeas } from '../services/geminiService';
 import { AppProduct, Language } from '../types';
-import { Loader, Sparkles, Zap, Smartphone, Globe, Cpu, Gamepad, Layers, Box } from './Icons';
+import { Loader, Sparkles, Zap, Smartphone, Globe, Cpu, Gamepad, Layers, Box, Key, Eye, EyeOff } from './Icons';
 import { AppCard } from './AppCard';
 
 interface IdeaGeneratorProps {
@@ -22,6 +22,8 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
   const [niche, setNiche] = useState('');
   const [platform, setPlatform] = useState('Mobile');
   const [complexity, setComplexity] = useState('Standard');
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentIdeas, setCurrentIdeas] = useState<AppProduct[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
     setCurrentIdeas([]);
 
     try {
-      const rawIdeas = await generateAppIdeas(niche, platform, complexity);
+      const rawIdeas = await generateAppIdeas(niche, platform, complexity, 3, apiKey);
       
       const processedIdeas: AppProduct[] = rawIdeas.map((idea, index) => ({
         ...idea,
@@ -52,7 +54,7 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
       console.error("Failed to generate ideas:", err);
       setError(isAr 
         ? "فشل في توليد الأفكار. يرجى المحاولة بموضوع مختلف أو التحقق من الاتصال." 
-        : "Failed to generate ideas. Please try a different topic or check your connection."
+        : "Failed to generate ideas. Please check your API key or connection."
       );
     } finally {
       setIsLoading(false);
@@ -135,6 +137,34 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="relative">
+             <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1 ml-1">{isAr ? 'مفتاح API مخصص (اختياري)' : 'Custom API Key (Optional)'}</label>
+             <div className="relative">
+               <div className={`absolute inset-y-0 ${isAr ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
+                 <Key className="h-4 w-4 text-slate-400" />
+               </div>
+               <input
+                 type={showApiKey ? "text" : "password"}
+                 className={`block w-full ${isAr ? 'pr-10 pl-10' : 'pl-10 pr-10'} py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition`}
+                 placeholder={isAr ? "أدخل مفتاح Gemini API الخاص بك" : "Enter your Gemini API Key"}
+                 value={apiKey}
+                 onChange={(e) => setApiKey(e.target.value)}
+               />
+               <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className={`absolute inset-y-0 ${isAr ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center text-slate-400 hover:text-slate-600`}
+               >
+                  {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+               </button>
+             </div>
+             <p className="text-[10px] text-slate-400 mt-1 ml-1">
+               {isAr 
+                 ? 'اتركه فارغاً لاستخدام المفتاح الافتراضي للنظام. يتم استخدام مفتاحك محلياً فقط.' 
+                 : 'Leave empty to use the system default key. Your key is only used locally.'}
+             </p>
           </div>
 
           <button

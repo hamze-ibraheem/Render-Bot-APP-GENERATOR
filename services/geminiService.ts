@@ -5,16 +5,17 @@ export const generateAppIdeas = async (
   niche: string,
   platform: string = 'Mobile',
   complexity: string = 'Standard',
-  count: number = 3
+  count: number = 3,
+  apiKey?: string
 ): Promise<GeneratedIdeaRaw[]> => {
   try {
-    const apiKey = process.env.API_KEY || "";
-    if (!apiKey) {
+    const keyToUse = apiKey || process.env.API_KEY || "";
+    if (!keyToUse) {
       console.warn("API Key is missing or empty.");
     }
 
     // Initialize client inside function to ensure fresh config
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new GoogleGenerativeAI(keyToUse);
     
     // Use the latest flash model for best performance and schema adherence
     const model = genAI.getGenerativeModel({

@@ -9,7 +9,7 @@ export const generateAppIdeas = async (
   apiKey?: string
 ): Promise<GeneratedIdeaRaw[]> => {
   try {
-    const keyToUse = apiKey || process.env.API_KEY || "";
+    const keyToUse = apiKey || import.meta.env.VITE_API_KEY, || "";
     if (!keyToUse) {
       console.warn("API Key is missing or empty.");
     }

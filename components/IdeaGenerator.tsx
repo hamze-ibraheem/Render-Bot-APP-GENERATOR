@@ -1,10 +1,12 @@
 
+
 import React, { useState } from 'react';
 import { generateAppIdeas } from '../services/geminiService';
-import { AppProduct, Language } from '../types';
+import { AppProduct, Language, User } from '../types';
 import { Loader, Sparkles, Zap, Smartphone, Globe, Cpu, Gamepad, Layers, Box, Key, Eye, EyeOff } from './Icons';
 import { AppCard } from './AppCard';
 import JSZip from 'jszip';
+import { translations } from '../translations';
 
 interface IdeaGeneratorProps {
   onIdeasGenerated: (ideas: AppProduct[]) => void;
@@ -12,6 +14,7 @@ interface IdeaGeneratorProps {
   onSave?: (product: AppProduct) => void;
   savedIds?: string[];
   language?: Language;
+  user?: User | null;
 }
 
 export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({ 
@@ -19,7 +22,8 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
   onAddToCart,
   onSave,
   savedIds = [],
-  language = 'en'
+  language = 'en',
+  user
 }) => {
   const [niche, setNiche] = useState('');
   const [platform, setPlatform] = useState('Mobile');
@@ -31,6 +35,7 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const isAr = language === 'ar';
+  const t = translations[language];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +69,12 @@ export const IdeaGenerator: React.FC<IdeaGeneratorProps> = ({
   };
 
   const handleDownload = async (idea: AppProduct) => {
+      // Enterprise Restriction for downloading generated source code
+      if (user?.plan !== 'Enterprise' && user?.role !== 'super-admin') {
+          alert(t.gen_download_restricted);
+          return;
+      }
+
       try {
         const zip = new JSZip();
         

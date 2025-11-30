@@ -195,6 +195,7 @@ export const MOCK_USER: User = {
   plan: 'Enterprise', // Upgraded to show off features
   credits: 850,
   points: 1250,
+  downloadsRemaining: 999999,
   memberSince: 'Oct 2023',
   role: 'manager' // Set to manager to demonstrate role-based tabs
 };

@@ -1,4 +1,5 @@
 
+
 import { Language } from './types';
 
 export const translations = {
@@ -116,6 +117,16 @@ export const translations = {
     dl_restricted_title: "Upgrade Required",
     dl_restricted_msg: "Source code and design assets require a Pro or Enterprise plan.",
     dl_started: "Download started...",
+
+    // Generator
+    gen_download_restricted: "Downloading generated source code is exclusive to Enterprise subscribers.",
+
+    // Direct Access
+    btn_download_now: "Download Now",
+    btn_claim_app: "Claim App",
+    btn_add_cart: "Add to Cart",
+    btn_buy_blueprint: "Buy Blueprint",
+    txt_remaining: "remaining",
   },
   ar: {
     // Navbar
@@ -231,5 +242,15 @@ export const translations = {
     dl_restricted_title: "الترقية مطلوبة",
     dl_restricted_msg: "يتطلب الكود المصدري وملفات التصميم خطة Pro أو Enterprise.",
     dl_started: "بدأ التحميل...",
+
+    // Generator
+    gen_download_restricted: "تحميل الكود المصدري للتطبيقات المولدة حصري لمشتركي باقة الشركات (Enterprise).",
+
+    // Direct Access
+    btn_download_now: "حمل الآن",
+    btn_claim_app: "المطالبة بالتطبيق",
+    btn_add_cart: "أضف للسلة",
+    btn_buy_blueprint: "شراء المخطط",
+    txt_remaining: "متبقي",
   }
 };

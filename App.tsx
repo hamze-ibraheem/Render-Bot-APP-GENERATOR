@@ -1,4 +1,7 @@
 
+
+
+
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -145,6 +148,7 @@ export default function App() {
          plan: 'Enterprise',
          credits: 999999,
          points: 999999,
+         downloadsRemaining: 999999,
          memberSince: 'Mar 2024',
          role: 'super-admin',
          mobileConfig: {
@@ -161,7 +165,11 @@ export default function App() {
     }
 
     // Simulate standard login by setting mock user
-    const newUser = { ...MOCK_USER, email };
+    const newUser: User = { 
+        ...MOCK_USER, 
+        email,
+        downloadsRemaining: MOCK_USER.plan === 'Enterprise' ? 999999 : (MOCK_USER.plan === 'Pro' ? 10 : 0)
+    };
     setUser(newUser);
     showToast(language === 'ar' ? `مرحباً بعودتك، ${newUser.name}!` : `Welcome back, ${newUser.name}!`);
     navigateTo('dashboard');
@@ -188,6 +196,7 @@ export default function App() {
       // Give more initial credits to Developers and Vendors
       credits: (role === 'developer') ? 50 : 20,
       points: 0,
+      downloadsRemaining: 0, // Free users start with 0 direct downloads
       memberSince: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       role: role
     };
@@ -205,10 +214,49 @@ export default function App() {
 
   const handleUpdateUser = (updates: Partial<User>) => {
     if (user) {
-      const updatedUser = { ...user, ...updates };
+      let updatedUser = { ...user, ...updates };
+      // If plan is updated, refresh quotas
+      if (updates.plan) {
+         if (updates.plan === 'Enterprise') updatedUser.downloadsRemaining = 999999;
+         else if (updates.plan === 'Pro') updatedUser.downloadsRemaining = 10;
+         else updatedUser.downloadsRemaining = 0;
+      }
       setUser(updatedUser);
       showToast(language === 'ar' ? "تم تحديث الحساب بنجاح" : `Account updated successfully`);
     }
+  };
+
+  const handleDirectAccess = (product: AppProduct) => {
+    if (!user) return;
+    
+    const isEnterprise = user.plan === 'Enterprise' || user.role === 'super-admin';
+    const hasQuota = user.downloadsRemaining > 0;
+
+    if (!isEnterprise && !hasQuota) {
+        showToast(language === 'ar' ? "رصيد التحميل نفذ. يرجى الشراء." : "Download quota exceeded. Please purchase.");
+        return;
+    }
+
+    // Deduct quota if not enterprise
+    if (!isEnterprise) {
+        setUser(prev => prev ? ({ ...prev, downloadsRemaining: prev.downloadsRemaining - 1 }) : null);
+    }
+
+    // Add to orders as a free order
+    const newOrder: Order = {
+        id: `ord-${Date.now()}`,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        items: [product],
+        total: 0,
+        status: 'Completed',
+        downloadUrl: '#'
+    };
+
+    setOrders(prev => [newOrder, ...prev]);
+    showToast(language === 'ar' ? "تمت إضافة التطبيق إلى تنزيلاتك!" : "App added to your downloads!");
+    
+    // Auto-navigate to downloads to show it worked (optional, but good UX)
+    // navigateTo('dashboard'); 
   };
 
   const toggleSaveApp = (product: AppProduct) => {
@@ -295,6 +343,8 @@ export default function App() {
                 onSave={toggleSaveApp}
                 savedIds={savedApps.map(a => a.id)}
                 language={language}
+                user={user}
+                onDirectAccess={handleDirectAccess}
               />
                <div className="text-center mt-12">
                 <button 
@@ -315,6 +365,7 @@ export default function App() {
             onSave={toggleSaveApp}
             savedIds={savedApps.map(a => a.id)}
             language={language}
+            user={user}
           />
         )}
 
@@ -335,6 +386,8 @@ export default function App() {
               onSave={toggleSaveApp}
               savedIds={savedApps.map(a => a.id)}
               language={language}
+              user={user}
+              onDirectAccess={handleDirectAccess}
             />
           </div>
         )}

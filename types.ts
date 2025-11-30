@@ -88,6 +88,7 @@ export interface User {
   plan: 'Free' | 'Pro' | 'Enterprise';
   credits: number;
   points: number;
+  downloadsRemaining: number; // For Pro/Free limits on direct downloads
   memberSince: string;
   role: UserRole;
   vendorStripe?: VendorStripeConfig;

@@ -1,6 +1,8 @@
 
+
+
 import React, { useState, useMemo, useEffect } from 'react';
-import { AppProduct, Language } from '../types';
+import { AppProduct, Language, User } from '../types';
 import { AppCard } from './AppCard';
 import { Search, ChevronLeft, ChevronRight } from './Icons';
 import { ProductDetailModal } from './ProductDetailModal';
@@ -12,6 +14,8 @@ interface MarketplaceProps {
   onSave?: (product: AppProduct) => void;
   savedIds?: string[];
   language?: Language;
+  user?: User | null;
+  onDirectAccess?: (product: AppProduct) => void;
 }
 
 const ITEMS_PER_PAGE = 12;
@@ -22,7 +26,9 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
   featured = false,
   onSave,
   savedIds = [],
-  language = 'en'
+  language = 'en',
+  user,
+  onDirectAccess
 }) => {
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -179,6 +185,8 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
                 isSaved={savedIds.includes(product.id)}
                 onClick={setSelectedProduct}
                 language={language}
+                user={user}
+                onDirectAccess={onDirectAccess}
               />
             ))}
           </div>
@@ -236,6 +244,8 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
           onSave={onSave}
           isSaved={savedIds.includes(selectedProduct.id)}
           language={language}
+          user={user}
+          onDirectAccess={onDirectAccess}
         />
       )}
     </div>

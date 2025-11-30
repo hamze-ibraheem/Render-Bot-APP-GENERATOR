@@ -1,8 +1,11 @@
 
+
+
 import React, { useState, useEffect } from 'react';
-import { AppProduct, Review, Language } from '../types';
-import { X, ShoppingBag, Heart, Zap, Check, Cpu, Users, Store, Award, Shield, CreditCard, LayoutDashboard, Globe, Sparkles, Activity, Lock, Copyright, FileText, Flag, MessageSquare, Star, Send, Bell, Calendar, Video, Smartphone, Database, Trophy, ChevronLeft, ChevronRight } from './Icons';
+import { AppProduct, Review, Language, User } from '../types';
+import { X, ShoppingBag, Heart, Zap, Check, Cpu, Users, Store, Award, Shield, CreditCard, LayoutDashboard, Globe, Sparkles, Activity, Lock, Copyright, FileText, Flag, MessageSquare, Star, Send, Bell, Calendar, Video, Smartphone, Database, Trophy, ChevronLeft, ChevronRight, DownloadCloud } from './Icons';
 import { generateAppScreenSvg } from './AppCard';
+import { translations } from '../translations';
 
 interface ProductDetailModalProps {
   product: AppProduct;
@@ -12,6 +15,8 @@ interface ProductDetailModalProps {
   onSave?: (product: AppProduct) => void;
   isSaved?: boolean;
   language?: Language;
+  user?: User | null;
+  onDirectAccess?: (product: AppProduct) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -21,7 +26,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onAddToCart,
   onSave,
   isSaved,
-  language = 'en'
+  language = 'en',
+  user,
+  onDirectAccess
 }) => {
   if (!isOpen) return null;
 
@@ -29,6 +36,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           name_ar, tagline_ar, description_ar, features_ar, category_ar, targetAudience_ar } = product;
 
   const isAr = language === 'ar';
+  const t = translations[language];
   
   const displayName = (isAr && name_ar) ? name_ar : name;
   const displayTagline = (isAr && tagline_ar) ? tagline_ar : tagline;
@@ -158,6 +166,52 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   const handleReport = () => {
     alert(isAr ? "تم الإبلاغ عن الانتهاك. سيقوم فريقنا القانوني بمراجعة هذا الطلب." : "Infringement reported. Our legal team will review this request.");
+  };
+
+  // Determine button state
+  const isEnterprise = user?.plan === 'Enterprise' || user?.role === 'super-admin';
+  const hasQuota = user && user.downloadsRemaining > 0;
+
+  const renderActionButton = () => {
+      if (onDirectAccess && (isEnterprise || hasQuota)) {
+        return (
+          <button 
+            onClick={(e) => {
+               onDirectAccess(product);
+               onClose();
+            }}
+            className={`w-full py-4 rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-2 ${
+               isEnterprise 
+                 ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200 dark:shadow-none' 
+                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
+            }`}
+          >
+            {isEnterprise ? (
+              <>
+                <DownloadCloud className="w-5 h-5" />
+                {t.btn_download_now}
+              </>
+            ) : (
+              <>
+                <Zap className="w-5 h-5" />
+                {t.btn_claim_app} ({user.downloadsRemaining})
+              </>
+            )}
+          </button>
+        );
+      }
+      return (
+         <button 
+            onClick={() => {
+              onAddToCart(product);
+              onClose();
+            }}
+            className="w-full py-4 bg-slate-900 dark:bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-600 dark:hover:bg-indigo-500 transition flex items-center justify-center gap-2"
+          >
+            <ShoppingBag className="w-5 h-5" />
+            {isAr ? 'أضف إلى السلة' : 'Add to Cart'}
+          </button>
+      );
   };
 
   return (
@@ -466,16 +520,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                  </div>
                  
                  <div className="space-y-3">
-                   <button 
-                     onClick={() => {
-                       onAddToCart(product);
-                       onClose();
-                     }}
-                     className="w-full py-4 bg-slate-900 dark:bg-indigo-600 text-white rounded-xl font-bold shadow-lg hover:bg-indigo-600 dark:hover:bg-indigo-500 transition flex items-center justify-center gap-2"
-                   >
-                     <ShoppingBag className="w-5 h-5" />
-                     {isAr ? 'أضف إلى السلة' : 'Add to Cart'}
-                   </button>
+                   {renderActionButton()}
                    
                    {onSave && (
                      <button 

@@ -1,7 +1,10 @@
 
+
+
 import React from 'react';
-import { AppProduct, Language } from '../types';
-import { ShoppingBag, Zap, Heart, Store, Check, Download } from './Icons';
+import { AppProduct, Language, User } from '../types';
+import { ShoppingBag, Zap, Heart, Store, Check, Download, DownloadCloud } from './Icons';
+import { translations } from '../translations';
 
 interface AppCardProps {
   product: AppProduct;
@@ -11,6 +14,8 @@ interface AppCardProps {
   onClick?: (product: AppProduct) => void;
   onDownload?: (product: AppProduct) => void;
   language?: Language;
+  user?: User | null;
+  onDirectAccess?: (product: AppProduct) => void;
 }
 
 // Helper to generate a data URI for the app screenshot
@@ -192,12 +197,15 @@ export const AppCard: React.FC<AppCardProps> = ({
   isSaved, 
   onClick, 
   onDownload,
-  language = 'en' 
+  language = 'en',
+  user,
+  onDirectAccess
 }) => {
   const { name, tagline, description, price, features, imageSeed, isAI, vendorName, category, imageUrl, 
           name_ar, tagline_ar, description_ar, features_ar, category_ar } = product;
   
   const isAr = language === 'ar';
+  const t = translations[language];
   
   const displayName = (isAr && name_ar) ? name_ar : name;
   const displayTagline = (isAr && tagline_ar) ? tagline_ar : tagline;
@@ -220,6 +228,55 @@ export const AppCard: React.FC<AppCardProps> = ({
   
   // Use custom image if available, otherwise generate SVG based on seed/name
   const displayImage = imageUrl || generateAppScreenSvg(displayName, displayTagline, seed, 'home');
+
+  // Determine button state
+  const isEnterprise = user?.plan === 'Enterprise' || user?.role === 'super-admin';
+  const hasQuota = user && user.downloadsRemaining > 0;
+  
+  // Render main action button based on plan
+  const renderActionButton = () => {
+    if (onDirectAccess && (isEnterprise || hasQuota)) {
+      return (
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onDirectAccess(product);
+          }}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
+            isEnterprise 
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none' 
+              : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+          }`}
+          title={!isEnterprise ? `${user.downloadsRemaining} ${t.txt_remaining}` : ''}
+        >
+          {isEnterprise ? (
+            <>
+              <DownloadCloud className="w-4 h-4" />
+              {t.btn_download_now}
+            </>
+          ) : (
+            <>
+              <Zap className="w-4 h-4" />
+              {t.btn_claim_app} <span className="text-[10px] opacity-80">({user.downloadsRemaining})</span>
+            </>
+          )}
+        </button>
+      );
+    }
+
+    return (
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          onAddToCart(product);
+        }}
+        className="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-600 dark:hover:bg-indigo-500 transition flex items-center gap-2"
+      >
+        <ShoppingBag className="w-4 h-4" />
+        {isAr ? 'شراء المخطط' : 'Buy Blueprint'}
+      </button>
+    );
+  };
 
   return (
     <div 
@@ -313,7 +370,11 @@ export const AppCard: React.FC<AppCardProps> = ({
         <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 mt-auto" itemProp="offers" itemScope itemType="https://schema.org/Offer">
           <meta itemProp="priceCurrency" content="USD" />
           <div className="text-slate-900 dark:text-white font-bold text-lg">
-            $<span itemProp="price">{price}</span>
+            {price > 0 ? (
+               <span>$<span itemProp="price">{price}</span></span>
+            ) : (
+               <span className="text-emerald-600">Free</span>
+            )}
           </div>
           <div className="flex gap-2">
             {onDownload && (
@@ -328,16 +389,7 @@ export const AppCard: React.FC<AppCardProps> = ({
                 <Download className="w-4 h-4" />
               </button>
             )}
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddToCart(product);
-              }}
-              className="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-600 dark:hover:bg-indigo-500 transition flex items-center gap-2"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {isAr ? 'شراء المخطط' : 'Buy Blueprint'}
-            </button>
+            {renderActionButton()}
           </div>
         </div>
       </div>

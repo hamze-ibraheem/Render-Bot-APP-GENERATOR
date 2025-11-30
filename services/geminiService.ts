@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedIdeaRaw } from '../types';
 
 export const generateAppIdeas = async (
@@ -15,13 +15,8 @@ export const generateAppIdeas = async (
     }
 
     // Initialize client inside function to ensure fresh config
-    const genAI = new GoogleGenerativeAI(keyToUse);
+    const ai = new GoogleGenAI({ apiKey: keyToUse });
     
-    // Use the latest flash model for best performance and schema adherence
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-    });
-
     const prompt = `Generate ${count} unique, viable, and innovative ${complexity} ${platform} app ideas for the niche: "${niche}". 
       Each idea MUST include both English and Arabic versions for the name, tagline, description, category, feature list, and target audience.
       For the Arabic fields, ensure the translation is high-quality, professional, and culturally appropriate.
@@ -29,38 +24,39 @@ export const generateAppIdeas = async (
       
       Output strictly valid JSON array matching the provided schema. Do not include markdown code blocks.`;
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }]}],
-      generationConfig: {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
         responseMimeType: "application/json",
         responseSchema: {
-          type: SchemaType.ARRAY,
+          type: Type.ARRAY,
           items: {
-            type: SchemaType.OBJECT,
+            type: Type.OBJECT,
             properties: {
-              name: { type: SchemaType.STRING },
-              name_ar: { type: SchemaType.STRING },
-              tagline: { type: SchemaType.STRING },
-              tagline_ar: { type: SchemaType.STRING },
-              description: { type: SchemaType.STRING },
-              description_ar: { type: SchemaType.STRING },
-              price: { type: SchemaType.NUMBER },
-              category: { type: SchemaType.STRING },
-              category_ar: { type: SchemaType.STRING },
+              name: { type: Type.STRING },
+              name_ar: { type: Type.STRING },
+              tagline: { type: Type.STRING },
+              tagline_ar: { type: Type.STRING },
+              description: { type: Type.STRING },
+              description_ar: { type: Type.STRING },
+              price: { type: Type.NUMBER },
+              category: { type: Type.STRING },
+              category_ar: { type: Type.STRING },
               features: { 
-                type: SchemaType.ARRAY,
-                items: { type: SchemaType.STRING }
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
               },
               features_ar: { 
-                type: SchemaType.ARRAY,
-                items: { type: SchemaType.STRING }
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
               },
               techStack: { 
-                type: SchemaType.ARRAY,
-                items: { type: SchemaType.STRING }
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
               },
-              targetAudience: { type: SchemaType.STRING },
-              targetAudience_ar: { type: SchemaType.STRING }
+              targetAudience: { type: Type.STRING },
+              targetAudience_ar: { type: Type.STRING }
             },
             required: [
               "name", "name_ar", 
@@ -77,9 +73,8 @@ export const generateAppIdeas = async (
       }
     });
 
-    const response = result.response;
-    if (response) {
-      let text = response.text();
+    let text = response.text;
+    if (text) {
       // Robust cleaning of markdown code blocks if present
       if (text.startsWith("```json")) {
         text = text.replace(/^```json\s*/, "").replace(/\s*```$/, "");

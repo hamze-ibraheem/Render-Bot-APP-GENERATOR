@@ -9,7 +9,8 @@ export const generateAppIdeas = async (
   apiKey?: string
 ): Promise<GeneratedIdeaRaw[]> => {
   try {
-    const keyToUse = apiKey || import.meta.env.VITE_API_KEY, || "";
+     // Correct way: use function argument → fallback to Vite env var
+        const keyToUse = apiKey || import.meta.env.VITE_API_KEY || "";
     if (!keyToUse) {
       console.warn("API Key is missing or empty.");
     }

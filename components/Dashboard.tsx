@@ -7,6 +7,7 @@ import { MOCK_TEAM, MOCK_POINT_HISTORY } from '../constants';
 import { DeploymentModal } from './DeploymentModal';
 import { PhysicalOrderModal } from './PhysicalOrderModal';
 import { translations } from '../translations';
+import JSZip from 'jszip';
 
 type Tab = 'overview' | 'saved' | 'downloads' | 'orders' | 'subscription' | 'rewards' | 'referrals' | 'vendor' | 'team' | 'admin' | 'settings';
 
@@ -396,7 +397,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }, 2500);
   };
 
-  const handleDownloadAsset = (type: 'docs' | 'code' | 'design', item: AppProduct) => {
+  const handleDownloadAsset = async (type: 'docs' | 'code' | 'design', item: AppProduct) => {
     if (currentUser.plan === 'Free' && type !== 'docs') {
        showToast(t.dl_restricted_msg);
        return;
@@ -404,13 +405,54 @@ export const Dashboard: React.FC<DashboardProps> = ({
     
     showToast(t.dl_started);
     
-    // Simulate download
-    const link = document.createElement('a');
-    link.href = '#';
-    link.setAttribute('download', `${item.name.replace(/\s+/g, '-').toLowerCase()}-${type}.zip`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+        let content: Blob | null = null;
+        let extension = 'txt';
+        const safeName = item.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        if (type === 'docs') {
+             const zip = new JSZip();
+             const mdContent = `# ${item.name}\n\n## Tagline\n${item.tagline}\n\n## Description\n${item.description}\n\n## Features\n${item.features.join('\n- ')}\n\n## Tech Stack\n${item.techStack.join(', ')}`;
+             zip.file(`${safeName}-docs.md`, mdContent);
+             zip.file("LICENSE", "Standard License\nCopyright 2024");
+             content = await zip.generateAsync({ type: "blob" });
+             extension = 'zip';
+        } else if (type === 'code') {
+             const zip = new JSZip();
+             const root = zip.folder(safeName);
+             if (root) {
+                root.file("package.json", `{\n  "name": "${safeName}",\n  "version": "1.0.0"\n}`);
+                const src = root.folder("src");
+                if (src) {
+                    src.file("index.js", `console.log("Starting ${item.name}...");`);
+                    src.file("App.js", `// Main App Component for ${item.name}`);
+                }
+             }
+             content = await zip.generateAsync({ type: "blob" });
+             extension = 'zip';
+        } else if (type === 'design') {
+             const seed = item.imageSeed || item.name.length;
+             const svgDataUrl = generateAppScreenSvg(item.name, item.tagline, seed);
+             // Fetch the blob from the data URL
+             const res = await fetch(svgDataUrl);
+             content = await res.blob();
+             extension = 'svg';
+        }
+
+        if (content) {
+            const url = window.URL.createObjectURL(content);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${safeName}-${type}.${extension}`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+    } catch (error) {
+        console.error("Download failed", error);
+        showToast("Download failed. Please try again.");
+    }
   };
 
   return (
@@ -956,70 +998,62 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                {/* Plans Grid */}
                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 {SUBSCRIPTION_PLANS.map((plan) => {
-                   const isCurrent = currentUser.plan === plan.name;
-                   // Logic: If current is 'Free', 'Pro' is upgrade. If current is 'Pro', 'Enterprise' is upgrade, 'Free' is downgrade.
-                   const isUpgrade = 
-                      (currentUser.plan === 'Free' && plan.name !== 'Free') || 
-                      (currentUser.plan === 'Pro' && plan.name === 'Enterprise');
-                   
-                   return (
-                     <div 
-                       key={plan.name} 
-                       className={`relative rounded-2xl p-6 border flex flex-col transition-all duration-300 ${
-                         isCurrent 
-                           ? 'border-indigo-500 ring-2 ring-indigo-500 dark:bg-slate-900/50 bg-indigo-50/50' 
-                           : plan.color
-                       } ${plan.popular && !isCurrent ? 'shadow-lg scale-[1.02] md:scale-105 z-10' : 'shadow-sm hover:shadow-md'}`}
-                     >
-                        {plan.popular && (
-                           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-                              Most Popular
-                           </div>
-                        )}
-                        <div className="mb-4">
-                           <h3 className={`text-xl font-bold ${plan.name === 'Enterprise' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{plan.name}</h3>
-                           <div className="flex items-baseline mt-2">
-                              <span className={`text-3xl font-bold ${plan.name === 'Enterprise' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>${plan.price}</span>
-                              <span className={`text-sm ml-1 ${plan.name === 'Enterprise' ? 'text-slate-400' : 'text-slate-500 dark:text-slate-400'}`}>{t.sub_month}</span>
-                           </div>
-                        </div>
-                        
-                        <div className="space-y-3 mb-8 flex-grow">
-                           {plan.features.map((feat, i) => (
-                              <div key={i} className="flex items-center gap-2 text-sm">
-                                 <div className={`p-0.5 rounded-full ${plan.name === 'Enterprise' ? 'bg-slate-700 text-green-400' : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'}`}>
-                                    <Check className="w-3 h-3" />
-                                 </div>
-                                 <span className={plan.name === 'Enterprise' ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}>{feat}</span>
-                              </div>
-                           ))}
-                        </div>
+                 {SUBSCRIPTION_PLANS.map((plan) => (
+                   <div 
+                     key={plan.name} 
+                     className={`relative rounded-2xl p-6 border flex flex-col transition-all duration-300 ${
+                       currentUser.plan === plan.name 
+                         ? 'border-indigo-500 ring-2 ring-indigo-500 dark:bg-slate-900/50 bg-indigo-50/50' 
+                         : plan.color
+                     } ${plan.popular && currentUser.plan !== plan.name ? 'shadow-lg scale-[1.02] md:scale-105 z-10' : 'shadow-sm hover:shadow-md'}`}
+                   >
+                      {plan.popular && (
+                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                            Most Popular
+                         </div>
+                      )}
+                      <div className="mb-4">
+                         <h3 className={`text-xl font-bold ${plan.name === 'Enterprise' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{plan.name}</h3>
+                         <div className="flex items-baseline mt-2">
+                            <span className={`text-3xl font-bold ${plan.name === 'Enterprise' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>${plan.price}</span>
+                            <span className={`text-sm ml-1 ${plan.name === 'Enterprise' ? 'text-slate-400' : 'text-slate-500 dark:text-slate-400'}`}>{t.sub_month}</span>
+                         </div>
+                      </div>
+                      
+                      <div className="space-y-3 mb-8 flex-grow">
+                         {plan.features.map((feat, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                               <div className={`p-0.5 rounded-full ${plan.name === 'Enterprise' ? 'bg-slate-700 text-green-400' : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'}`}>
+                                  <Check className="w-3 h-3" />
+                               </div>
+                               <span className={plan.name === 'Enterprise' ? 'text-slate-300' : 'text-slate-600 dark:text-slate-300'}>{feat}</span>
+                            </div>
+                         ))}
+                      </div>
 
-                        <button 
-                           onClick={() => !isCurrent && handleUpgrade(plan.name as any)}
-                           disabled={isCurrent || isProcessing === plan.name}
-                           className={`w-full py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 ${
-                              isCurrent 
-                                 ? 'bg-green-500 text-white cursor-default'
-                                 : isUpgrade
-                                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none'
-                                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                           } ${isProcessing === plan.name ? 'opacity-75 cursor-wait' : ''}`}
-                        >
-                           {isProcessing === plan.name ? (
-                              <Loader className="w-4 h-4 animate-spin" />
-                           ) : isCurrent ? (
-                              <><Check className="w-4 h-4" /> {t.sub_current}</>
-                           ) : isUpgrade ? (
-                              <><Zap className="w-4 h-4" /> {t.sub_upgrade}</>
-                           ) : (
-                              t.sub_downgrade
-                           )}
-                        </button>
-                     </div>
-                   );
-                 })}
+                      <button 
+                         onClick={() => currentUser.plan !== plan.name && handleUpgrade(plan.name as any)}
+                         disabled={currentUser.plan === plan.name || isProcessing === plan.name}
+                         className={`w-full py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 ${
+                            currentUser.plan === plan.name 
+                               ? 'bg-green-500 text-white cursor-default'
+                               : (currentUser.plan === 'Free' && plan.name !== 'Free') || (currentUser.plan === 'Pro' && plan.name === 'Enterprise')
+                                  ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none'
+                                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                         } ${isProcessing === plan.name ? 'opacity-75 cursor-wait' : ''}`}
+                      >
+                         {isProcessing === plan.name ? (
+                            <Loader className="w-4 h-4 animate-spin" />
+                         ) : currentUser.plan === plan.name ? (
+                            <><Check className="w-4 h-4" /> {t.sub_current}</>
+                         ) : (currentUser.plan === 'Free' && plan.name !== 'Free') || (currentUser.plan === 'Pro' && plan.name === 'Enterprise') ? (
+                            <><Zap className="w-4 h-4" /> {t.sub_upgrade}</>
+                         ) : (
+                            t.sub_downgrade
+                         )}
+                      </button>
+                   </div>
+                 ))}
                </div>
 
                {/* Billing History */}

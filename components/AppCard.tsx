@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AppProduct, Language } from '../types';
-import { ShoppingBag, Zap, Heart, Store, Check } from './Icons';
+import { ShoppingBag, Zap, Heart, Store, Check, Download } from './Icons';
 
 interface AppCardProps {
   product: AppProduct;
@@ -9,6 +9,7 @@ interface AppCardProps {
   onSave?: (product: AppProduct) => void;
   isSaved?: boolean;
   onClick?: (product: AppProduct) => void;
+  onDownload?: (product: AppProduct) => void;
   language?: Language;
 }
 
@@ -184,7 +185,15 @@ export const generateAppScreenSvg = (
   return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
 };
 
-export const AppCard: React.FC<AppCardProps> = ({ product, onAddToCart, onSave, isSaved, onClick, language = 'en' }) => {
+export const AppCard: React.FC<AppCardProps> = ({ 
+  product, 
+  onAddToCart, 
+  onSave, 
+  isSaved, 
+  onClick, 
+  onDownload,
+  language = 'en' 
+}) => {
   const { name, tagline, description, price, features, imageSeed, isAI, vendorName, category, imageUrl, 
           name_ar, tagline_ar, description_ar, features_ar, category_ar } = product;
   
@@ -306,16 +315,30 @@ export const AppCard: React.FC<AppCardProps> = ({ product, onAddToCart, onSave, 
           <div className="text-slate-900 dark:text-white font-bold text-lg">
             $<span itemProp="price">{price}</span>
           </div>
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart(product);
-            }}
-            className="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-600 dark:hover:bg-indigo-500 transition flex items-center gap-2"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            {isAr ? 'شراء المخطط' : 'Buy Blueprint'}
-          </button>
+          <div className="flex gap-2">
+            {onDownload && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDownload(product);
+                }}
+                className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                title={isAr ? "تحميل الملخص" : "Download Brief"}
+              >
+                <Download className="w-4 h-4" />
+              </button>
+            )}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToCart(product);
+              }}
+              className="bg-slate-900 dark:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-600 dark:hover:bg-indigo-500 transition flex items-center gap-2"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              {isAr ? 'شراء المخطط' : 'Buy Blueprint'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

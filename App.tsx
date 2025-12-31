@@ -27,12 +27,12 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [generatedApps, setGeneratedApps] = useState<AppProduct[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  
+
   // Auth & User State
   const [user, setUser] = useState<User | null>(null);
   const [savedApps, setSavedApps] = useState<AppProduct[]>([]);
   const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
-  
+
   // Vendor State
   const [vendorApps, setVendorApps] = useState<AppProduct[]>(MOCK_VENDOR_APPS);
 
@@ -72,7 +72,7 @@ export default function App() {
     root.lang = language;
     root.dir = language === 'ar' ? 'rtl' : 'ltr';
     localStorage.setItem('language', language);
-    
+
     // Update font family based on language for better Arabic rendering
     if (language === 'ar') {
       document.body.style.fontFamily = "'Cairo', sans-serif";
@@ -93,7 +93,7 @@ export default function App() {
   useEffect(() => {
     const storedUser = localStorage.getItem('renderbot_user');
     const storedSavedApps = localStorage.getItem('renderbot_saved');
-    
+
     if (storedUser) setUser(JSON.parse(storedUser));
     if (storedSavedApps) setSavedApps(JSON.parse(storedSavedApps));
   }, []);
@@ -114,11 +114,17 @@ export default function App() {
   };
 
   const addToCart = (product: AppProduct) => {
+    console.log('Adding to cart:', product.name);
     setCart(prev => {
       const exists = prev.find(item => item.product.id === product.id);
-      if (exists) return prev;
+      if (exists) {
+        console.log('Item exists in cart:', product.name);
+        return prev;
+      }
       showToast(language === 'ar' ? `تمت إضافة ${product.name_ar || product.name} إلى السلة` : `Added ${product.name} to cart`);
-      return [...prev, { product, quantity: 1 }];
+      const newCart = [...prev, { product, quantity: 1 }];
+      console.log('New cart state:', newCart);
+      return newCart;
     });
     setIsCartOpen(true);
   };
@@ -140,35 +146,35 @@ export default function App() {
   const handleLogin = (email: string, password?: string) => {
     // Check for Super Admin credentials
     if (email === 'hamzaalsarsour@taskfoundation.net' && password === 'Hamzere@RE589185') {
-       const superAdminUser: User = {
-         id: 'sa-001',
-         name: 'Hamza Alsarsour',
-         email: email,
-         avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hamza',
-         plan: 'Enterprise',
-         credits: 999999,
-         points: 999999,
-         downloadsRemaining: 999999,
-         memberSince: 'Mar 2024',
-         role: 'super-admin',
-         mobileConfig: {
-           appName: 'Task Foundation App',
-           packageName: 'net.taskfoundation.app',
-           version: '1.0.0',
-           status: 'Ready'
-         }
-       };
-       setUser(superAdminUser);
-       showToast(language === 'ar' ? `مرحباً بك أيها المسؤول المتميز، حمزة!` : `Welcome Super Admin, Hamza!`);
-       navigateTo('dashboard');
-       return;
+      const superAdminUser: User = {
+        id: 'sa-001',
+        name: 'Hamza Alsarsour',
+        email: email,
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hamza',
+        plan: 'Enterprise',
+        credits: 999999,
+        points: 999999,
+        downloadsRemaining: 999999,
+        memberSince: 'Mar 2024',
+        role: 'super-admin',
+        mobileConfig: {
+          appName: 'Task Foundation App',
+          packageName: 'net.taskfoundation.app',
+          version: '1.0.0',
+          status: 'Ready'
+        }
+      };
+      setUser(superAdminUser);
+      showToast(language === 'ar' ? `مرحباً بك أيها المسؤول المتميز، حمزة!` : `Welcome Super Admin, Hamza!`);
+      navigateTo('dashboard');
+      return;
     }
 
     // Simulate standard login by setting mock user
-    const newUser: User = { 
-        ...MOCK_USER, 
-        email,
-        downloadsRemaining: MOCK_USER.plan === 'Enterprise' ? 999999 : (MOCK_USER.plan === 'Pro' ? 10 : 0)
+    const newUser: User = {
+      ...MOCK_USER,
+      email,
+      downloadsRemaining: MOCK_USER.plan === 'Enterprise' ? 999999 : (MOCK_USER.plan === 'Pro' ? 10 : 0)
     };
     setUser(newUser);
     showToast(language === 'ar' ? `مرحباً بعودتك، ${newUser.name}!` : `Welcome back, ${newUser.name}!`);
@@ -178,12 +184,12 @@ export default function App() {
   const handleSignup = (name: string, email: string, role: UserRole) => {
     // Check if role requires approval
     if (role === 'admin' || role === 'vendor') {
-       showToast(language === 'ar' 
-         ? "تم استلام طلبك! حسابك قيد المراجعة للموافقة." 
-         : "Registration successful! Your account is pending approval.");
-       // Do not set user, navigate to login
-       navigateTo('login');
-       return;
+      showToast(language === 'ar'
+        ? "تم استلام طلبك! حسابك قيد المراجعة للموافقة."
+        : "Registration successful! Your account is pending approval.");
+      // Do not set user, navigate to login
+      navigateTo('login');
+      return;
     }
 
     // Create new user object based on signup info
@@ -217,9 +223,9 @@ export default function App() {
       let updatedUser = { ...user, ...updates };
       // If plan is updated, refresh quotas
       if (updates.plan) {
-         if (updates.plan === 'Enterprise') updatedUser.downloadsRemaining = 999999;
-         else if (updates.plan === 'Pro') updatedUser.downloadsRemaining = 10;
-         else updatedUser.downloadsRemaining = 0;
+        if (updates.plan === 'Enterprise') updatedUser.downloadsRemaining = 999999;
+        else if (updates.plan === 'Pro') updatedUser.downloadsRemaining = 10;
+        else updatedUser.downloadsRemaining = 0;
       }
       setUser(updatedUser);
       showToast(language === 'ar' ? "تم تحديث الحساب بنجاح" : `Account updated successfully`);
@@ -228,33 +234,33 @@ export default function App() {
 
   const handleDirectAccess = (product: AppProduct) => {
     if (!user) return;
-    
+
     const isEnterprise = user.plan === 'Enterprise' || user.role === 'super-admin';
     const hasQuota = user.downloadsRemaining > 0;
 
     if (!isEnterprise && !hasQuota) {
-        showToast(language === 'ar' ? "رصيد التحميل نفذ. يرجى الشراء." : "Download quota exceeded. Please purchase.");
-        return;
+      showToast(language === 'ar' ? "رصيد التحميل نفذ. يرجى الشراء." : "Download quota exceeded. Please purchase.");
+      return;
     }
 
     // Deduct quota if not enterprise
     if (!isEnterprise) {
-        setUser(prev => prev ? ({ ...prev, downloadsRemaining: prev.downloadsRemaining - 1 }) : null);
+      setUser(prev => prev ? ({ ...prev, downloadsRemaining: prev.downloadsRemaining - 1 }) : null);
     }
 
     // Add to orders as a free order
     const newOrder: Order = {
-        id: `ord-${Date.now()}`,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        items: [product],
-        total: 0,
-        status: 'Completed',
-        downloadUrl: '#'
+      id: `ord-${Date.now()}`,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      items: [product],
+      total: 0,
+      status: 'Completed',
+      downloadUrl: '#'
     };
 
     setOrders(prev => [newOrder, ...prev]);
     showToast(language === 'ar' ? "تمت إضافة التطبيق إلى تنزيلاتك!" : "App added to your downloads!");
-    
+
     // Auto-navigate to downloads to show it worked (optional, but good UX)
     // navigateTo('dashboard'); 
   };
@@ -294,7 +300,7 @@ export default function App() {
       navigateTo('login');
       return;
     }
-    
+
     if (user.role === 'vendor') {
       showToast(language === 'ar' ? "أنت بالفعل بائع مسجل." : "You are already a registered vendor.");
       navigateTo('dashboard');
@@ -312,9 +318,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden dark:bg-slate-950 transition-colors duration-300">
-      <Navbar 
-        onNavigate={navigateTo} 
-        cartCount={cart.length} 
+      <Navbar
+        onNavigate={navigateTo}
+        cartCount={cart.length}
         onOpenCart={() => setIsCartOpen(true)}
         currentPage={currentPage}
         user={user}
@@ -328,7 +334,7 @@ export default function App() {
       <main className="flex-grow pt-20">
         {currentPage === 'home' && (
           <>
-            <Hero onGetStarted={() => navigateTo('generator')} t={t} />
+            <Hero onGetStarted={() => navigateTo('generator')} onBrowse={() => navigateTo('marketplace')} t={t} />
             <div className="container mx-auto px-4 py-16">
               <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-4 dark:text-white">{t.feat_title}</h2>
@@ -336,9 +342,9 @@ export default function App() {
                   {t.feat_subtitle}
                 </p>
               </div>
-              <Marketplace 
-                products={[...MOCK_APPS.slice(0, 3), ...vendorApps.slice(0, 1)]} 
-                onAddToCart={addToCart} 
+              <Marketplace
+                products={[...MOCK_APPS.slice(0, 3), ...vendorApps.slice(0, 1)]}
+                onAddToCart={addToCart}
                 featured={true}
                 onSave={toggleSaveApp}
                 savedIds={savedApps.map(a => a.id)}
@@ -346,8 +352,8 @@ export default function App() {
                 user={user}
                 onDirectAccess={handleDirectAccess}
               />
-               <div className="text-center mt-12">
-                <button 
+              <div className="text-center mt-12">
+                <button
                   onClick={() => navigateTo('marketplace')}
                   className="px-8 py-3 bg-white border border-slate-200 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition shadow-sm dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
@@ -359,8 +365,8 @@ export default function App() {
         )}
 
         {currentPage === 'generator' && (
-          <IdeaGenerator 
-            onIdeasGenerated={handleGeneratedIdeas} 
+          <IdeaGenerator
+            onIdeasGenerated={handleGeneratedIdeas}
             onAddToCart={addToCart}
             onSave={toggleSaveApp}
             savedIds={savedApps.map(a => a.id)}
@@ -374,15 +380,15 @@ export default function App() {
             <div className="mb-8">
               <h1 className="text-4xl font-bold mb-2 dark:text-white">{t.nav_marketplace}</h1>
               <p className="text-slate-600 dark:text-slate-400">
-                {language === 'ar' 
+                {language === 'ar'
                   ? "اكتشف مفاهيم تطبيقات جاهزة وأكواد برمجية تم إنشاؤها بواسطة الذكاء الاصطناعي وخبراء معتمدين."
                   : "Discover ready-made app concepts and codebases generated by AI and vetted experts."
                 }
               </p>
             </div>
-            <Marketplace 
-              products={allApps} 
-              onAddToCart={addToCart} 
+            <Marketplace
+              products={allApps}
+              onAddToCart={addToCart}
               onSave={toggleSaveApp}
               savedIds={savedApps.map(a => a.id)}
               language={language}
@@ -393,8 +399,8 @@ export default function App() {
         )}
 
         {currentPage === 'vendors' && (
-          <VendorsList 
-            onNavigate={() => navigateTo('marketplace')} 
+          <VendorsList
+            onNavigate={() => navigateTo('marketplace')}
             onBecomeVendor={handleBecomeVendor}
             language={language}
           />
@@ -403,7 +409,7 @@ export default function App() {
         {currentPage === 'pricing' && (
           <Pricing onNavigate={user ? () => navigateTo('dashboard') : () => navigateTo('login')} />
         )}
-        
+
         {currentPage === 'copyright' && (
           <CopyrightPolicy />
         )}
@@ -421,7 +427,7 @@ export default function App() {
         )}
 
         {currentPage === 'dashboard' && user && (
-          <Dashboard 
+          <Dashboard
             user={user}
             savedApps={savedApps}
             orders={orders}
@@ -439,10 +445,10 @@ export default function App() {
 
       <Footer onNavigate={navigateTo} t={t} />
 
-      <CartDrawer 
-        isOpen={isCartOpen} 
-        onClose={() => setIsCartOpen(false)} 
-        cart={cart} 
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
         onRemove={removeFromCart}
         language={language}
       />

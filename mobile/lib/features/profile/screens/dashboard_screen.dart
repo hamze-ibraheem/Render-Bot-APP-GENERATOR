@@ -5,21 +5,12 @@ import '../models/user.dart';
 import 'overview_tab.dart';
 import 'saved_apps_tab.dart';
 import 'orders_tab.dart';
+import '../../auth/providers/auth_provider.dart';
 
-// Mock User Provider for Demo
-final userProvider = Provider<User>((ref) {
-  return User(
-    id: 'u-123',
-    name: 'Alex Creator',
-    email: 'alex@example.com',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/png?seed=Alex',
-    plan: 'Enterprise',
-    credits: 850,
-    points: 1250,
-    downloadsRemaining: 999999,
-    memberSince: 'Oct 2023',
-    role: UserRole.manager,
-  );
+// User Provider that reads from Auth State
+final userProvider = Provider<User?>((ref) {
+  final authState = ref.watch(authProvider);
+  return authState.user;
 });
 
 

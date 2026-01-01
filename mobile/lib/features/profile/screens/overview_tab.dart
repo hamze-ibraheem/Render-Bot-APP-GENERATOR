@@ -13,6 +13,13 @@ class OverviewTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
     
+    // Handle null user (shouldn't happen if navigation is correct, but safety first)
+    if (user == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(

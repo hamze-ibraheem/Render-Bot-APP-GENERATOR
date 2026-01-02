@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+part 'marketplace_screen.g.dart';
 
 // Simple model for AppProduct to mock data locally
+@HiveType(typeId: 3)
 class AppProduct {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final String tagline;
+  @HiveField(3)
   final String description;
+  @HiveField(4)
   final double price;
+  @HiveField(5)
   final String category;
+  @HiveField(6)
   final String imageSeed;
 
   AppProduct({
@@ -30,7 +41,7 @@ class MarketplaceScreen extends StatefulWidget {
 
 class _MarketplaceScreenState extends State<MarketplaceScreen> {
   // Mock Data mimicking constants.ts
-  final List<AppProduct> _products = [
+  final List<AppProduct> _mockProducts = [
     AppProduct(
       id: 'app-1',
       name: 'ZenFocus',
@@ -69,8 +80,29 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     ),
   ];
 
+  List<AppProduct> _products = [];
   String _searchQuery = '';
   String _selectedCategory = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  void _loadProducts() {
+    final box = Hive.box('marketplaceIdeasBox');
+    
+    if (box.isEmpty) {
+      // Seed with mock data
+      for (var p in _mockProducts) {
+        box.put(p.id, p);
+      }
+      _products = _mockProducts;
+    } else {
+      _products = box.values.toList().cast<AppProduct>();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

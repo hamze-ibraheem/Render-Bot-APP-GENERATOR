@@ -12,8 +12,29 @@ import 'features/marketplace/screens/marketplace_screen.dart';
 import 'features/generator/screens/idea_generator_screen.dart';
 import 'features/common/widgets/bottom_nav_screen.dart';
 
+import 'package:hive_flutter/hive_flutter.dart';
+import 'features/profile/models/user.dart';
+import 'models/generated_idea.dart';
+
 void main() async {
   await dotenv.load(fileName: ".env");
+  
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Register Adapters
+  Hive.registerAdapter(UserAdapter());
+  Hive.registerAdapter(UserRoleAdapter());
+  Hive.registerAdapter(VendorMobileConfigAdapter());
+  Hive.registerAdapter(AppProductAdapter());
+  Hive.registerAdapter(GeneratedIdeaAdapter());
+  
+  // Open Boxes
+  await Hive.openBox('authBox');
+  await Hive.openBox('marketplaceIdeasBox');
+  await Hive.openBox('userIdeasBox');
+  await Hive.openBox('favoritesBox');
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

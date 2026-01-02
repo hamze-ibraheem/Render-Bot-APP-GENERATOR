@@ -1,17 +1,36 @@
+import 'package:hive/hive.dart';
+
+part 'generated_idea.g.dart';
+
+@HiveType(typeId: 4)
 class GeneratedIdea {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final String nameAr;
+  @HiveField(2)
   final String tagline;
+  @HiveField(3)
   final String taglineAr;
+  @HiveField(4)
   final String description;
+  @HiveField(5)
   final String descriptionAr;
+  @HiveField(6)
   final double price;
+  @HiveField(7)
   final String category;
+  @HiveField(8)
   final String categoryAr;
+  @HiveField(9)
   final List<String> features;
+  @HiveField(10)
   final List<String> featuresAr;
+  @HiveField(11)
   final List<String> techStack;
+  @HiveField(12)
   final String targetAudience;
+  @HiveField(13)
   final String targetAudienceAr;
 
   GeneratedIdea({

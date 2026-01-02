@@ -1,5 +1,5 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../profile/models/user.dart';
 
 // Simple Auth State
@@ -37,6 +37,20 @@ final authProvider = NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new)
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
+    final box = Hive.box('authBox');
+    final bool isAuthenticated = box.get('isAuthenticated', defaultValue: false);
+    final User? user = box.get('user');
+    
+    // If we have a user but for some reason isAuthenticated is false, we might want to check that.
+    // But we'll trust the stored boolean for now, or just check if user != null.
+    
+    if (isAuthenticated && user != null) {
+      return AuthState(
+        isAuthenticated: true,
+        user: user,
+      );
+    }
+    
     return AuthState();
   }
 
@@ -48,10 +62,7 @@ class AuthNotifier extends Notifier<AuthState> {
 
     // Check for Super Admin credentials (matches App.tsx)
     if (email == 'hamzaalsarsour@taskfoundation.net' && password == 'Hamzere@RE589185') {
-      state = state.copyWith(
-        isAuthenticated: true,
-        isLoading: false,
-        user: User(
+      final user = User(
           id: 'sa-001',
           name: 'Hamza Alsarsour',
           email: email,
@@ -68,17 +79,25 @@ class AuthNotifier extends Notifier<AuthState> {
             version: '1.0.0',
             status: 'Ready',
           ),
-        ),
+        );
+        
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        user: user,
       );
+      
+      // Save to Hive
+      final box = Hive.box('authBox');
+      box.put('isAuthenticated', true);
+      box.put('user', user);
+      
       return;
     }
 
     // Standard Mock User Login (Matches MOCK_USER in constants.ts)
     if (email.isNotEmpty && password.length >= 6) {
-      state = state.copyWith(
-        isAuthenticated: true,
-        isLoading: false,
-        user: User(
+      final user = User(
           id: 'u-123',
           name: 'Alex Creator',
           email: email, // Override with entered email
@@ -89,8 +108,18 @@ class AuthNotifier extends Notifier<AuthState> {
           downloadsRemaining: 999999,
           memberSince: 'Oct 2023',
           role: UserRole.manager,
-        ),
+        );
+
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        user: user,
       );
+      
+      // Save to Hive
+      final box = Hive.box('authBox');
+      box.put('isAuthenticated', true);
+      box.put('user', user);
     } else {
       state = state.copyWith(
         isLoading: false,
@@ -116,10 +145,7 @@ class AuthNotifier extends Notifier<AuthState> {
     }
 
     if (name.isNotEmpty && email.isNotEmpty) {
-      state = state.copyWith(
-        isAuthenticated: true,
-        isLoading: false,
-        user: User(
+      final user = User(
           id: 'u-${DateTime.now().millisecondsSinceEpoch}',
           name: name,
           email: email,
@@ -131,8 +157,18 @@ class AuthNotifier extends Notifier<AuthState> {
           points: 0,
           downloadsRemaining: 0,
           memberSince: 'Now',
-        ),
+        );
+
+      state = state.copyWith(
+        isAuthenticated: true,
+        isLoading: false,
+        user: user,
       );
+      
+      // Save to Hive
+      final box = Hive.box('authBox');
+      box.put('isAuthenticated', true);
+      box.put('user', user);
     } else {
       state = state.copyWith(
         isLoading: false,
@@ -143,5 +179,9 @@ class AuthNotifier extends Notifier<AuthState> {
 
   void logout() {
     state = AuthState(); // Reset state
+    
+    Hive.box('authBox').clear();
+    Hive.box('userIdeasBox').clear();
+    Hive.box('favoritesBox').clear();
   }
 }

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:renderbot_mobile/features/auth/providers/auth_provider.dart';
 import 'package:renderbot_mobile/services/gemini_service.dart';
 import 'package:renderbot_mobile/models/generated_idea.dart';
 
-class IdeaGeneratorScreen extends StatefulWidget {
+class IdeaGeneratorScreen extends ConsumerStatefulWidget {
   const IdeaGeneratorScreen({super.key});
 
   @override
-  State<IdeaGeneratorScreen> createState() => _IdeaGeneratorScreenState();
+  ConsumerState<IdeaGeneratorScreen> createState() => _IdeaGeneratorScreenState();
 }
 
-class _IdeaGeneratorScreenState extends State<IdeaGeneratorScreen> {
+class _IdeaGeneratorScreenState extends ConsumerState<IdeaGeneratorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nicheController = TextEditingController();
   final _apiKeyController = TextEditingController();
@@ -24,13 +27,35 @@ class _IdeaGeneratorScreenState extends State<IdeaGeneratorScreen> {
   
   final GeminiService _geminiService = GeminiService();
 
+  @override
+  void initState() {
+    super.initState();
+    // Check Auth after frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = ref.read(authProvider);
+      if (!authState.isAuthenticated) {
+        context.push('/register');
+      }
+    });
+
+    _loadUserIdeas();
+  }
+
+  void _loadUserIdeas() {
+    final box = Hive.box('userIdeasBox');
+    if (box.isNotEmpty) {
+      setState(() {
+        _generatedIdeas = box.values.toList().cast<GeneratedIdea>().reversed.toList();
+      });
+    }
+  }
+
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
     
     setState(() {
       _isLoading = true;
       _error = null;
-      _generatedIdeas = [];
     });
 
     try {
@@ -41,9 +66,16 @@ class _IdeaGeneratorScreenState extends State<IdeaGeneratorScreen> {
         apiKey: _apiKeyController.text,
       );
       
+      // Save to Hive
+      final box = Hive.box('userIdeasBox');
+      for (var idea in ideas) {
+        await box.add(idea);
+      }
+      
       if (mounted) {
         setState(() {
-          _generatedIdeas = ideas;
+          // Prepend new ideas or reload from box
+           _generatedIdeas = box.values.toList().cast<GeneratedIdea>().reversed.toList();
         });
       }
     } catch (e) {

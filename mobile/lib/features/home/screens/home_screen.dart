@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../auth/providers/auth_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Using a SafeArea to avoid system UI overlays
     return Scaffold(
       body: SingleChildScrollView(
@@ -99,6 +101,13 @@ class HomeScreen extends StatelessWidget {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
+                             // Check Auth
+                             final authState = ref.read(authProvider);
+                             if (!authState.isAuthenticated) {
+                               // Redirect to login/register flow
+                               context.push('/register');
+                               return;
+                             }
                              // Navigate to Generator
                              context.push('/generator');
                           },

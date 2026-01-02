@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:renderbot_mobile/theme/app_theme.dart';
 import 'features/profile/screens/dashboard_screen.dart';
 import 'features/auth/screens/auth_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'features/home/screens/home_screen.dart';
+import 'features/marketplace/screens/marketplace_screen.dart';
+import 'features/generator/screens/idea_generator_screen.dart';
+import 'features/common/widgets/bottom_nav_screen.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const ProviderScope(child: MyApp()));
 }
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -19,30 +28,49 @@ class MyApp extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     final router = GoRouter(
-      initialLocation: '/auth',
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: '/',
       routes: [
-        GoRoute(
-          path: '/auth',
-          builder: (context, state) => const AuthScreen(),
+        ShellRoute(
+          navigatorKey: _shellNavigatorKey,
+          builder: (context, state, child) {
+            return BottomNavScreen(child: child);
+          },
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => const HomeScreen(),
+            ),
+            GoRoute(
+              path: '/marketplace',
+              builder: (context, state) => const MarketplaceScreen(),
+            ),
+            GoRoute(
+              path: '/generator',
+              builder: (context, state) => const IdeaGeneratorScreen(),
+            ),
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) {
+                // If not authenticated, show AuthScreen, otherwise Dashboard
+                if (!authState.isAuthenticated) {
+                  return const AuthScreen();
+                }
+                return const DashboardScreen();
+              },
+            ),
+          ],
         ),
+        // Auth routes outside ShellRoute if full screen needed, 
+        // OR keep them inside if we want the nav bar to persist. 
+        // For now, let's keep register standalone or handle it within AuthScreen flow.
         GoRoute(
+          parentNavigatorKey: _rootNavigatorKey, // Full screen
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
         ),
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const DashboardScreen(),
-        ),
       ],
-      redirect: (context, state) {
-        final isAuthenticated = authState.isAuthenticated;
-        final isAuthRoute = state.uri.path == '/auth' || state.uri.path == '/register';
-
-        if (!isAuthenticated && !isAuthRoute) return '/auth';
-        if (isAuthenticated && isAuthRoute) return '/';
-
-        return null;
-      },
+      // Removed the strict redirect loop
     );
 
     return MaterialApp.router(
